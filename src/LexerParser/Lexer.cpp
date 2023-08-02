@@ -92,6 +92,13 @@ namespace  JDD::Lexer {
                     }
                     break;
 
+                case ' ':
+                    if (current.type == IDENTIFIANT || current.type == INT || current.type == DOUBLE) {
+                        OverToken(current, tokenList);
+                    }
+                    current.type = WHITESPACE;
+                    break;
+
                 default:
                     if (current.type == WHITESPACE || current.type == INT || current.type == DOUBLE) {
                         OverToken(current, tokenList);
