@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "src/LexerParser/Lexer.h"
+#include "src/LexerParser/Parser.h"
 
 bool endsWith(std::string_view str, std::string_view suffix) {
     if (str.length() >= suffix.length()) {
@@ -43,9 +44,7 @@ int main(int argc, char** argv) {
 
     auto tokenList = JDD::Lexer::Builder::ParserTokens(code);
 
-    for (const auto& e : tokenList) {
-        std::cout << e << std::endl;
-    }
+    JDD::Parser::JDDParser::main(tokenList);
 
     return 0;
 }
