@@ -1,0 +1,16 @@
+print("Hello World V1 \n");
+println("Hi");
+
+private void myFunc() {
+    print("Only this file can call this one");
+}
+
+public void myFunc() {
+    print("Every files .jdd can call me !");
+}
+
+protected void myFunc() [file.jdd] {
+    print("files.jdd can call me");
+}
+
+// Comment, protected function != protected function in a class
