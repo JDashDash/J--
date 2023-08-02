@@ -35,7 +35,7 @@ namespace JDD::Lexer {
     public:
         enum Types type = WHITESPACE;
         std::string content;
-        int line = 0;
+        int line = 1;
 
         friend std::ostream& operator<<(std::ostream& flux, Token const& token);
     };
