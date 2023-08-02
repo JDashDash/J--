@@ -65,17 +65,22 @@ namespace  JDD::Lexer {
 
 
                 case '\n':
-                    if (current.type == POSSIBLE_STRING || current.type == STRING) {
-                        current.content.append(1, element);
-                    } else {
+                    if (current.type != POSSIBLE_LONG_COMMENT && current.type != LONG_COMMENT) {
                         OverToken(current, tokenList);
                         current.line += 1;
+                    }
+                    else if (current.type == POSSIBLE_STRING || current.type == STRING) {
+                        current.content.append(1, element);
                     }
                     break;
 
                 case '/':
                     if (current.type == POSSIBLE_STRING || current.type == COMMENT) {
                         current.content.append(1, element);
+                    } else if (current.type == LONG_COMMENT) {
+                        current.type = COMMENT;
+                        current.content.append(1, element);
+                        OverToken(current, tokenList);
                     } else if (current.type == OPERATOR) {
                         current.type = COMMENT;
                         current.content.append(1, element);
@@ -87,6 +92,22 @@ namespace  JDD::Lexer {
                     break;
 
                 case '*':
+                    if (current.type == OPERATOR) {
+                        current.type = POSSIBLE_LONG_COMMENT;
+                        current.content.append(1,element);
+                    } else if (current.type == POSSIBLE_LONG_COMMENT) {
+                        current.type = LONG_COMMENT;
+                        current.content.append(1,element);
+                    } else if (current.type != POSSIBLE_STRING) {
+                        OverToken(current, tokenList);
+                        current.type = OPERATOR;
+                        current.content.append(1,element);
+                        OverToken(current, tokenList);
+                    } else {
+                        current.content.append(1,element);
+                    }
+                    break;
+
                 case '+':
                 case '-':
                 case '{':
@@ -100,7 +121,7 @@ namespace  JDD::Lexer {
                 case ',':
                 case '<':
                 case '>':
-                    if (current.type != POSSIBLE_STRING) {
+                    if (current.type != POSSIBLE_STRING && current.type != COMMENT) {
                         OverToken(current, tokenList);
                         current.type = OPERATOR;
                         current.content.append(1,element);
@@ -112,7 +133,7 @@ namespace  JDD::Lexer {
 
                 case ' ':
                     current.content.append(1,element);
-                    if (current.type != POSSIBLE_STRING && current.type != COMMENT) {
+                    if (current.type != POSSIBLE_STRING && current.type != COMMENT && current.type != POSSIBLE_LONG_COMMENT) {
                         OverToken(current, tokenList);
                     }
                     break;

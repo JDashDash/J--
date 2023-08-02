@@ -14,8 +14,9 @@ namespace JDD::Lexer {
         POSSIBLE_STRING,
         STRING,
         OPERATOR,
-        POSSIBLE_COMMENT,
-        COMMENT
+        COMMENT,
+        POSSIBLE_LONG_COMMENT,
+        LONG_COMMENT
     };
 
     inline constexpr const char *sAllTokenTypes[] {
@@ -27,8 +28,9 @@ namespace JDD::Lexer {
             "POSSIBLE_STRING",
             "STRING",
             "OPERATOR",
-            "POSSIBLE_COMMENT",
-            "COMMENT"
+            "COMMENT", // conclude comments
+            "POSSIBLE_LONG_COMMENT",
+            "LONG_COMMENT"
     };
 
     class Token {
