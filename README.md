@@ -14,6 +14,36 @@ The language with this name following the inspiration of Java and if we find "Da
 
 The language will use files with the extension *.jdd*.
 
+## Example
+```
+print("Hello World V1 \n");
+println("Hi");
+
+int a = 5;
+double b = 52.3;
+string a = "cc";
+boolean c = true;
+
+private void myFunc() {
+    print("Only this file can call this one");
+}
+
+public void myFunc() {
+    print("Every files .jdd can call me !");
+}
+
+protected void myFunc() [file.jdd] {
+    print("files.jdd can call me");
+}
+
+// Comment, protected function != protected function in a class
+
+/*
+comment
+here
+*/
+```
+
 ## Links
 
 [Discord Server]()
