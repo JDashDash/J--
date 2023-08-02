@@ -49,25 +49,48 @@ namespace  JDD::Lexer {
                     } else {
                         current.content.append(1,element);
                     }
+                    break;
 
                 case '"':
                     if (current.type == WHITESPACE) {
                         current.type = POSSIBLE_STRING;
-                        current.content.append(1, element);
-                    }
-                    else if (current.type == POSSIBLE_STRING) {
+                        current.content.append(1,element);
+                    } else if (current.type == POSSIBLE_STRING) {
                         current.type = STRING;
-                        current.content.append(1, element);
+                        current.content.append(1,element);
                         OverToken(current, tokenList);
                     }
                     break;
 
+
+
                 case '\n':
-                    OverToken(current, tokenList);
-                    current.line += 1;
+                    if (current.type == POSSIBLE_STRING || current.type == STRING) {
+                        current.content.append(1, element);
+                    } else {
+                        OverToken(current, tokenList);
+                        current.line += 1;
+                    }
                     break;
 
                 case '/':
+                    if (current.type == POSSIBLE_COMMENT) {
+                        current.type = COMMENT;
+                        current.content.append(1, element);
+                    } else if (current.type != STRING) {
+                        OverToken(current, tokenList);
+                        current.type = OPERATOR;
+                        current.content.append(1, element);
+                        OverToken(current, tokenList);
+                    } else if (current.type == WHITESPACE) {
+                        OverToken(current, tokenList);
+                        current.type = POSSIBLE_COMMENT;
+                        current.content.append(1, element);
+                    } else {
+                        current.content.append(1, element);
+                    }
+                    break;
+
                 case '*':
                 case '+':
                 case '-':
@@ -93,10 +116,10 @@ namespace  JDD::Lexer {
                     break;
 
                 case ' ':
-                    if (current.type == IDENTIFIANT || current.type == INT || current.type == DOUBLE) {
+                    current.content.append(1,element);
+                    if (current.type != POSSIBLE_STRING) {
                         OverToken(current, tokenList);
                     }
-                    current.type = WHITESPACE;
                     break;
 
                 default:
@@ -110,7 +133,7 @@ namespace  JDD::Lexer {
                     break;
             }
         }
-
+        OverToken(current, tokenList);
         return tokenList;
     }
 
