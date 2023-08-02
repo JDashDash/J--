@@ -14,3 +14,8 @@ protected void myFunc() [file.jdd] {
 }
 
 // Comment, protected function != protected function in a class
+
+/*
+comment
+here
+*/
