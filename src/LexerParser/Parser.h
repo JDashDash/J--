@@ -15,6 +15,6 @@ namespace JDD::Parser {
         static bool ManagerInstruction(std::vector<Lexer::Token>::const_iterator& current, Definition::Data& data);
 
         // Instructions :
-        static void print(std::vector<Lexer::Token>::const_iterator& current, Definition::Data& data, bool jumpline);
+        static void print(std::vector<Lexer::Token>::const_iterator &current, bool jumpLine);
     };
 }

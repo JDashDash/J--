@@ -16,16 +16,16 @@ namespace JDD::Parser {
     bool JDDParser::ManagerInstruction(std::vector<Lexer::Token>::const_iterator& current, Definition::Data& data) {
         auto instruction = ExpectIdentifiant(current);
         if (instruction.has_value() && instruction->content == "print") {
-            print(current, data, false);
+            print(current, false);
             return true;
         }  if (instruction.has_value() && instruction->content == "println") {
-            print(current, data, true);
+            print(current, true);
             return true;
         }
         return false;
     }
 
-    void JDDParser::print(std::vector<Lexer::Token>::const_iterator& current, Definition::Data& data, bool jumpline) {
+    void JDDParser::print(std::vector<Lexer::Token>::const_iterator &current, bool jumpLine) {
         auto openValues = ExpectOperator(current, "(");
         if (!openValues.has_value()) {
             std::cout << "forgot to open '(' and make sure to close with ')'" << std::endl;
@@ -46,7 +46,7 @@ namespace JDD::Parser {
             std::cout << "forgot to close the instruction with ';'" << std::endl;
         }
 
-        if (jumpline) { std::cout << "\n"; }
+        if (jumpLine) { std::cout << "\n"; }
         std::cout << value->content;
     }
 }
