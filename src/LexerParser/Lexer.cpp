@@ -74,7 +74,7 @@ namespace  JDD::Lexer {
                     break;
 
                 case '/':
-                    if (current.type == POSSIBLE_STRING) {
+                    if (current.type == POSSIBLE_STRING || current.type == COMMENT) {
                         current.content.append(1, element);
                     } else if (current.type == OPERATOR) {
                         current.type = COMMENT;
@@ -112,7 +112,7 @@ namespace  JDD::Lexer {
 
                 case ' ':
                     current.content.append(1,element);
-                    if (current.type != POSSIBLE_STRING) {
+                    if (current.type != POSSIBLE_STRING && current.type != COMMENT) {
                         OverToken(current, tokenList);
                     }
                     break;
