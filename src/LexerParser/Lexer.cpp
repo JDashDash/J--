@@ -74,19 +74,14 @@ namespace  JDD::Lexer {
                     break;
 
                 case '/':
-                    if (current.type == POSSIBLE_COMMENT) {
+                    if (current.type == POSSIBLE_STRING) {
+                        current.content.append(1, element);
+                    } else if (current.type == OPERATOR) {
                         current.type = COMMENT;
                         current.content.append(1, element);
-                    } else if (current.type != STRING) {
+                    } else {
                         OverToken(current, tokenList);
                         current.type = OPERATOR;
-                        current.content.append(1, element);
-                        OverToken(current, tokenList);
-                    } else if (current.type == WHITESPACE) {
-                        OverToken(current, tokenList);
-                        current.type = POSSIBLE_COMMENT;
-                        current.content.append(1, element);
-                    } else {
                         current.content.append(1, element);
                     }
                     break;
