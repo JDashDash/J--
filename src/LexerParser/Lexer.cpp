@@ -1,9 +1,40 @@
+#include <sstream>
 #include "Lexer.h"
 
 namespace  JDD::Lexer {
     std::ostream &operator<<(std::ostream &flux, const JDD::Lexer::Token &token) {
         flux << "(Token: " << token.content << ", " << sAllTokenTypes[token.type] << ", " << token.line << ")";
         return flux;
+    }
+
+    std::string parseString(const std::string& content) {
+        std::stringstream result;
+        size_t pos = 1;
+        while (pos < content.size() - 1) {
+            if (content[pos] == '\\') {
+                switch (content[pos + 1]) {
+                    case 'n':
+                        result << '\n';
+                        break;
+                    case 't':
+                        result << '\t';
+                        break;
+                    case '\\':
+                        result << '\\';
+                        break;
+                    case '"':
+                        result << '"';
+                        break;
+                    default:
+                        break;
+                }
+                pos += 2;
+            } else {
+                result << content[pos];
+                pos++;
+            }
+        }
+        return result.str();
     }
 
     std::vector<Token> JDD::Lexer::Builder::ParserTokens(std::string_view code) {
@@ -58,6 +89,7 @@ namespace  JDD::Lexer {
                     } else if (current.type == POSSIBLE_STRING) {
                         current.type = STRING;
                         current.content.append(1,element);
+                        current.content = parseString(current.content);
                         OverToken(current, tokenList);
                     }
                     break;
@@ -65,12 +97,11 @@ namespace  JDD::Lexer {
 
 
                 case '\n':
-                    if (current.type != POSSIBLE_LONG_COMMENT && current.type != LONG_COMMENT) {
+                    if (current.type == POSSIBLE_STRING || current.type == STRING) {
+                        current.content.append(1, element);
+                    } else if (current.type != POSSIBLE_LONG_COMMENT && current.type != LONG_COMMENT) {
                         OverToken(current, tokenList);
                         current.line += 1;
-                    }
-                    else if (current.type == POSSIBLE_STRING || current.type == STRING) {
-                        current.content.append(1, element);
                     }
                     break;
 
