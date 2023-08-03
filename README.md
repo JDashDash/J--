@@ -44,7 +44,38 @@ here
 */
 ```
 
+## Modules
+
+Modules are "utilities" that users can add using the "import" statement (see the language documentation):
+
+### Example
+
+```
+import String;
+
+println("hi".concat("cc"));
+println("hi".getIndexFromChar("h"));
+println("hi".getCharFromIndex(0));
+println("hi".getCharFromIndex(1));
+println("hi".getCharFromIndex(2)); // Return void because it does not exist
+println("hi".equals("hi"));
+println("hi".equals("Hi"));
+println("hi".equalsIgnoreCase("hi"));
+println("hi".equalsIgnoreCase("hI"));
+println("hi".equalsIgnoreCase("HI"));
+println("".isEmpty());
+println("c".isEmpty());
+println("cc".isEmpty());
+println("CC".toLowerCase());
+println("CC".toUpperCase());
+println("cc".toUpperCase());
+println("ccaa bb".replace("a", "b"));
+println("ccaa bb".replace("b", "a"));
+```
+
 ## Links
+
+[Modules](https://github.com/JDashDash/Modules)
 
 [Discord Server]()
 
