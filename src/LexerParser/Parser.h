@@ -21,6 +21,6 @@ namespace JDD::Parser {
         static void variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data& data);
 
         // Special :
-        static bool callInTheVoid(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data);
+        static void updateVariableValue(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data, const std::string& var_name);
     };
 }

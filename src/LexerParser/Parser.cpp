@@ -36,9 +36,13 @@ namespace JDD::Parser {
             else
                 variables(current, JDD::Definition::Types::FINAL_NotType, data);
             return true;
-        } else if (!callInTheVoid(current, data)) {
-            return false;
         }
+        // Special : (a = 10, call a function)
+        else if (data.isVariable(instruction->content)) {
+            updateVariableValue(current, data, instruction->content);
+            return true;
+        }
+        return false;
     }
 
     void JDDParser::print(std::vector<Lexer::Token>::const_iterator &current, bool jumpLine, Definition::Data& data) {
@@ -56,7 +60,6 @@ namespace JDD::Parser {
         if (!ExpectOperator(current, ";").has_value())
             std::cerr << "forgot to close the instruction with ';'" << std::endl;
 
-
         if (jumpLine) { std::cout << "\n"; }
         std::cout << value->content;
     }
@@ -65,49 +68,49 @@ namespace JDD::Parser {
         std::optional<Definition::Types> var_type = type;
         if (type == Definition::FINAL_NotType) {
             var_type = ExpectType(current);
-            if (!var_type.has_value()) {
-                std::cerr << "forgot to give a type to your variable" << std::endl;
-            }
+            if (!var_type.has_value())
+                std::cerr << "Forgot to give a type to your variable" << std::endl;
         }
 
         auto var_name = ExpectIdentifiant(current);
-        if (!var_name.has_value()) {
-            std::cerr << "forgot to give a name to your variable" << std::endl;
-        }
+        if (!var_name.has_value())
+            std::cerr << "Forgot to give a name to your variable" << std::endl;
 
-        if (!ExpectOperator(current, "=").has_value()) {
-            std::cerr << "forgot to introduce the value of your variable" << std::endl;
-        }
+        if (!ExpectOperator(current, "=").has_value())
+            std::cerr << "Forgot to introduce the value of your variable" << std::endl;
 
         auto var_value = ExpectValue(current, data);
-        if (!var_value.has_value()) {
-            std::cerr << "forgot to give value to your variable" << std::endl;
-        }
+        if (!var_value.has_value())
+            std::cerr << "Forgot to give value to your variable" << std::endl;
 
-        if (!ExpectOperator(current, ";").has_value()) {
-            std::cerr << "forgot to close the instruction with ';'" << std::endl;
-        }
+        if (!ExpectOperator(current, ";").has_value())
+            std::cerr << "Forgot to close the instruction with ';'" << std::endl;
 
-        if (var_type != var_value->type) {
+        if (var_type != var_value->type)
             std::cerr << "The variable type is not valid for the value type" << std::endl;
-        }
+
+        if (data.isVariable(var_name->content))
+            std::cerr << "The variable already exist" << std::endl;
 
         Definition::Variable variable(var_name->content, var_value.value(), var_type.value(), type == Definition::FINAL_NotType);
         data.pushVariable(variable);
     }
 
+    void JDDParser::updateVariableValue(std::vector<Lexer::Token>::const_iterator& current, Definition::Data &data, const std::string& var_name) {
+        if (!ExpectOperator(current, "=").has_value())
+            std::cerr << "Forgot to introduce value with '='" << std::endl;
 
-    bool JDDParser::callInTheVoid(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data) {
-        if (data.isVariable(current->content)) {
-            if (!ExpectOperator(current, "=").has_value())
-                std::cerr << "Forgot to introduce value with '='" << std::endl;
+        auto value = ExpectValue(current, data);
+        if (!value.has_value())
+            std::cerr << "Forgot to give the new value to your variable" << std::endl;
 
-            auto new_value = ExpectValue(current, data);
-            if (!new_value.has_value())
-                std::cerr << "Forgot to give the new value of your variable" << std::endl;
+        if (!ExpectOperator(current, ";").has_value())
+            std::cerr << "forgot to close the instruction with ';'" << std::endl;
 
-            return true;
-        }
-        return false;
+        auto var = data.getVariable(var_name);
+        if (!var->isFinal)
+            data.updateValueOfVariable(var->name, value->content);
+        else
+            std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
     }
 }
