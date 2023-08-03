@@ -33,7 +33,7 @@ std::optional<JDD::Definition::Types> ExpectType(std::vector<JDD::Lexer::Token>:
     return std::nullopt;
 }
 
-std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>::const_iterator& current) {
+std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data) {
     if (current->type == JDD::Lexer::INT || current->type == JDD::Lexer::DOUBLE || current->type == JDD::Lexer::STRING ||
         (current->type == JDD::Lexer::IDENTIFIANT && (current->content == "true" || current->content == "false"))) {
 
@@ -42,7 +42,6 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
 
         if (current->type == JDD::Lexer::STRING) {
             v.type = JDD::Definition::Types::STRING;
-            v.content = v.content.substr(1, v.content.length() - 2); // Remove quotes
         } else if (current->type == JDD::Lexer::INT) {
             v.type = JDD::Definition::Types::INT;
         } else if (current->type == JDD::Lexer::DOUBLE) {
@@ -53,6 +52,12 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
 
         ++current;
         return v;
+    } else if (current->type == JDD::Lexer::IDENTIFIANT) {
+        if (data.isVariable(current->content)) {
+            auto var = data.getVariable(current->content);
+            ++current;
+            return var->value;
+        }
     }
 
     return std::nullopt;
