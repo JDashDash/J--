@@ -15,3 +15,10 @@ std::optional<JDD::Definition::Variable> JDD::Definition::Data::getVariable(cons
 void JDD::Definition::Data::pushVariable(const JDD::Definition::Variable& var) {
     this->Variables[var.name] = var;
 }
+
+void JDD::Definition::Data::updateValueOfVariable(const std::string &name, const std::string &value) {
+    if (this->isVariable(name)) {
+        auto var = this->getVariable(name);
+        this->Variables[var->name].value.content = value;
+    }
+}
