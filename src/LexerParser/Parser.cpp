@@ -58,7 +58,6 @@ namespace JDD::Parser {
         }
 
         std::string content = value->content;
-
         if (value.has_value() && ExpectOperator(current, ".").has_value() && value->type == Definition::STRING && data.isStringModuleImported) {
             JDD::Modules::ModulesManager::useStringModule(current, data, content, value);
         }
