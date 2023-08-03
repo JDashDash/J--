@@ -14,47 +14,50 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
                 std::cerr << "Request string to use the module and concat function" << std::endl;
 
-            content = JDD::Modules::String::concat(value->content, stringV->content);
+            content += JDD::Modules::String::concat(value->content, stringV->content);
         } else if (functionString->content == "getIndexFromChar") {
             auto stringV = ExpectValue(current, data);
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
                 std::cerr << "Request string to use the module and getIndexFromChar function" << std::endl;
 
-            content = std::to_string(JDD::Modules::String::getIndexFromChar(value->content, stringV->content[0]));
+            content += std::to_string(JDD::Modules::String::getIndexFromChar(value->content, stringV->content[0]));
         } else if (functionString->content == "getCharFromIndex") {
             auto stringV = ExpectValue(current, data);
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::INT)
                 std::cerr << "Request string to use the module and getCharFromIndex function" << std::endl;
 
-            content = JDD::Modules::String::getCharFromIndex(value->content, std::stoi(stringV->content));
+            content += JDD::Modules::String::getCharFromIndex(value->content, std::stoi(stringV->content));
         } else if (functionString->content == "equals") {
             auto stringV = ExpectValue(current, data);
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
                 std::cerr << "Request string to use the module and equals function" << std::endl;
 
-            content = std::to_string(JDD::Modules::String::equals(value->content, stringV->content));
-            if (content == "1") {
-                content = "true";
+            std::string beforeapply;
+            beforeapply = std::to_string(JDD::Modules::String::equals(value->content, stringV->content));
+            if (beforeapply == "1") {
+                content += "true";
             } else {
-                content = "false";
+                beforeapply += "false";
             }
         } else if (functionString->content == "equalsIgnoreCase") {
             auto stringV = ExpectValue(current, data);
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
                 std::cerr << "Request string to use the module and equalsIgnoreCase function" << std::endl;
 
-            content = std::to_string(JDD::Modules::String::equalsIgnoreCase(value->content, stringV->content));
-            if (content == "1") {
-                content = "true";
+            std::string beforeapply;
+            beforeapply = std::to_string(JDD::Modules::String::equalsIgnoreCase(value->content, stringV->content));
+            if (beforeapply == "1") {
+                content += "true";
             } else {
-                content = "false";
+                content += "false";
             }
         } else if (functionString->content == "isEmpty") {
-            content = std::to_string(JDD::Modules::String::isEmpty(value->content));
-            if (content == "1") {
-                content = "true";
+            std::string beforeapply;
+            beforeapply = std::to_string(JDD::Modules::String::isEmpty(value->content));
+            if (beforeapply == "1") {
+                content += "true";
             } else {
-                content = "false";
+                content += "false";
             }
         } else if (functionString->content == "toLowerCase") {
             content = JDD::Modules::String::toLowerCase(value->content);
@@ -72,13 +75,13 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
             if (!stringV2.has_value() || stringV2.value().type != JDD::Definition::STRING)
                 std::cerr << "Request string to use the module and replace function" << std::endl;
 
-            content = JDD::Modules::String::replace(value->content, stringV->content[0], stringV2->content[0]);
+            content += JDD::Modules::String::replace(value->content, stringV->content[0], stringV2->content[0]);
         } else if (functionString->content == "valueOf") {
             auto stringV = ExpectValue(current, data);
             if (!stringV.has_value())
                 std::cerr << "Request any value to use the module and replace function" << std::endl;
 
-            content = JDD::Modules::String::valueOf(stringV->content);
+            content += JDD::Modules::String::valueOf(stringV->content);
         } else {
             std::cerr << "The module String does not understand the function" << std::endl;
         }
