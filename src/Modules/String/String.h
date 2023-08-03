@@ -13,4 +13,5 @@ namespace JDD::Modules::String {
     std::string toLowerCase(const std::string& str1);
     std::string toUpperCase(const std::string& str1);
     std::string replace(const std::string& str1, char x, char y);
+    std::string valueOf(std::string &string);
 }

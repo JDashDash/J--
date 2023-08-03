@@ -63,4 +63,8 @@ namespace JDD::Modules::String {
         }
         return s;
     }
+
+    std::string valueOf(std::string& string) {
+        return string;
+    }
 }
