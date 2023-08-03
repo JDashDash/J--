@@ -52,14 +52,26 @@ namespace JDD::Parser {
         if (!openValues.has_value())
             std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
 
+        std::string content;
+
         auto value = ExpectValue(current, data);
         if (!value.has_value()) {
             std::cerr << "Specify a value" << std::endl;
         }
 
-        std::string content = value->content;
-        if (value.has_value() && ExpectOperator(current, ".").has_value() && value->type == Definition::STRING && data.isStringModuleImported) {
-            JDD::Modules::ModulesManager::useStringModule(current, data, content, value);
+        content = value->content;
+        while (true) {
+            if (ExpectOperator(current, ".").has_value() && value->type == Definition::STRING && data.isStringModuleImported) {
+                JDD::Modules::ModulesManager::useStringModule(current, data, content, value);
+            } else if (ExpectOperator(current, "+").has_value()) {
+                auto nextValue = ExpectValue(current, data);
+                if (!nextValue.has_value()) {
+                    std::cerr << "Specify the next value for concatenation" << std::endl;
+                }
+                content += nextValue->content;
+            } else {
+                break;
+            }
         }
 
         if (!ExpectOperator(current, ")").has_value())
@@ -71,6 +83,7 @@ namespace JDD::Parser {
         if (jumpLine) { std::cout << "\n"; }
         std::cout << content;
     }
+
 
     void JDDParser::variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data& data) {
         std::optional<Definition::Types> var_type = type;
