@@ -1,5 +1,10 @@
-#include <valarray>
 #include "Parser.h"
+
+#define ENABLE_STRING_MODULE
+
+#ifdef ENABLE_STRING_MODULE
+    #include "../Modules/String.h"
+#endif
 
 namespace JDD::Parser {
     void JDDParser::main(const std::vector<JDD::Lexer::Token>& tokenList) {
@@ -36,6 +41,9 @@ namespace JDD::Parser {
             else
                 variables(current, JDD::Definition::Types::FINAL_NotType, data);
             return true;
+        } else if (instruction.has_value() && instruction->content == "import") {
+            import(current, data);
+            return true;
         }
         // Special : (a = 10, call a function)
         else if (data.isVariable(instruction->content)) {
@@ -48,20 +56,44 @@ namespace JDD::Parser {
     void JDDParser::print(std::vector<Lexer::Token>::const_iterator &current, bool jumpLine, Definition::Data& data) {
         auto openValues = ExpectOperator(current, "(");
         if (!openValues.has_value())
-            std::cerr << "forgot to open '(' and make sure to close with ')'" << std::endl;
+            std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
 
         auto value = ExpectValue(current, data);
         if (!value.has_value())
-            std::cerr << "forgot to give value in print" << std::endl;
+            std::cerr << "Forgot to give value in print" << std::endl;
+
+        std::string content = value->content;
+
+        if (ExpectOperator(current ,".").has_value()) {
+            if (value->type == Definition::STRING) {
+                if (!data.isStringModuleImported)
+                    std::cerr << "You have to import the module 'String' in your current bloc" << std::endl;
+
+                auto functionString = ExpectIdentifiant(current);
+                if (functionString->content == "concat") {
+                    if (!ExpectOperator(current, "(").has_value())
+                        std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
+
+                    auto stringV = ExpectValue(current, data);
+                    if (!stringV.has_value() || stringV.value().type != Definition::STRING)
+                        std::cerr << "Request string to use the module and concat function" << std::endl;
+
+                    content = JDD::Modules::String::concat(value->content, stringV->content);
+
+                    if (!ExpectOperator(current, ")").has_value())
+                        std::cerr << "Forgot to close with ')'" << std::endl;
+                }
+            }
+        }
 
         if (!ExpectOperator(current, ")").has_value())
-            std::cerr << "forgot to close with ')'" << std::endl;
+            std::cerr << "Forgot to close with ')'" << std::endl;
 
         if (!ExpectOperator(current, ";").has_value())
-            std::cerr << "forgot to close the instruction with ';'" << std::endl;
+            std::cerr << "Forgot to close the instruction with ';'" << std::endl;
 
         if (jumpLine) { std::cout << "\n"; }
-        std::cout << value->content;
+        std::cout << content;
     }
 
     void JDDParser::variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data& data) {
@@ -112,5 +144,25 @@ namespace JDD::Parser {
             data.updateValueOfVariable(var->name, value->content);
         else
             std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
+    }
+
+    void JDDParser::import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data) {
+        auto possibleModule = ExpectIdentifiant(current);
+        if (!possibleModule.has_value()) {
+            /* For file, WIP
+            auto possibleFile = ExpectValue(current, data);
+            */
+        }
+
+        if (possibleModule.has_value() && possibleModule->content == "String") {
+            #ifdef ENABLE_STRING_MODULE
+                data.isStringModuleImported = true;
+            #else
+                std::cerr << "String module is not available." << std::endl;
+            #endif
+        }
+
+        if (!ExpectOperator(current, ";").has_value())
+            std::cerr << "forgot to close the instruction with ';'" << std::endl;
     }
 }
