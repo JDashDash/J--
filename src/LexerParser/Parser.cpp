@@ -1,11 +1,8 @@
 #include "Parser.h"
 
-#define ENABLE_STRING_MODULE
-#ifdef ENABLE_STRING_MODULE
-    #include "../Modules/String.h"
-#endif
-
 namespace JDD::Parser {
+
+
     void JDDParser::main(const std::vector<JDD::Lexer::Token>& tokenList) {
         Definition::Data data;
         auto current_token = tokenList.begin();
@@ -62,54 +59,7 @@ namespace JDD::Parser {
             std::cerr << "Forgot to give value in print" << std::endl;
 
         std::string content = value->content;
-
-        if (ExpectOperator(current ,".").has_value()) {
-            if (value->type == Definition::STRING) {
-                if (!data.isStringModuleImported)
-                    std::cerr << "You have to import the module 'String' in your current bloc" << std::endl;
-
-                auto functionString = ExpectIdentifiant(current);
-                if (functionString.has_value() && functionString->content == "concat") {
-                    if (!ExpectOperator(current, "(").has_value())
-                        std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
-
-                    auto stringV = ExpectValue(current, data);
-                    if (!stringV.has_value() || stringV.value().type != Definition::STRING)
-                        std::cerr << "Request string to use the module and concat function" << std::endl;
-
-                    content = JDD::Modules::String::concat(value->content, stringV->content);
-
-                    if (!ExpectOperator(current, ")").has_value())
-                        std::cerr << "Forgot to close with ')'" << std::endl;
-                } else if (functionString.has_value() && functionString->content == "getIndexFromChar") {
-                    if (!ExpectOperator(current, "(").has_value())
-                        std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
-
-                    auto stringV = ExpectValue(current, data);
-                    if (!stringV.has_value() || stringV.value().type != Definition::STRING)
-                        std::cerr << "Request string to use the module and getIndexFromChar function" << std::endl;
-
-                    content = std::to_string(JDD::Modules::String::getIndexFromChar(value->content, stringV->content[0]));
-
-                    if (!ExpectOperator(current, ")").has_value())
-                        std::cerr << "Forgot to close with ')'" << std::endl;
-                } else if (functionString.has_value() && functionString->content == "getCharFromIndex") {
-                    if (!ExpectOperator(current, "(").has_value())
-                        std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
-
-                    auto stringV = ExpectValue(current, data);
-                    if (!stringV.has_value() || stringV.value().type != Definition::INT)
-                        std::cerr << "Request string to use the module and getCharFromIndex function" << std::endl;
-
-                    content = JDD::Modules::String::getCharFromIndex(value->content, std::stoi(stringV->content));
-
-                    if (!ExpectOperator(current, ")").has_value())
-                        std::cerr << "Forgot to close with ')'" << std::endl;
-                }
-                else
-                    std::cerr << "This function is the String module is not available" << std::endl;
-            }
-        }
+        JDD::Modules::ModulesManager::useStringModule(current, data, content, value);
 
         if (!ExpectOperator(current, ")").has_value())
             std::cerr << "Forgot to close with ')'" << std::endl;
@@ -180,11 +130,7 @@ namespace JDD::Parser {
         }
 
         if (possibleModule.has_value() && possibleModule->content == "String") {
-            #ifdef ENABLE_STRING_MODULE
-                data.isStringModuleImported = true;
-            #else
-                std::cerr << "String module is not available." << std::endl;
-            #endif
+            data.isStringModuleImported = true;
         }
 
         if (!ExpectOperator(current, ";").has_value())

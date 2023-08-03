@@ -12,6 +12,8 @@
 #include "../Definitions/Types/Types.h"
 #include "../Definitions/Variables/Variables.h"
 
+#include "../Modules/ModuleManager.h"
+
 namespace JDD::Parser {
     class JDDParser {
     public:
