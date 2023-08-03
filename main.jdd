@@ -1,14 +1,5 @@
-print("Hi, ");
-print("hello world, how are you?");
-
-println("Bye bye !!!");
-
 int a = 10;
-boolean t = true;
-double d = 5.2;
-string msg = "Hello there!\nHow are you today?";
-
 println(a);
-println(t);
-println(d);
-println(msg);
+
+final int b = 1;
+println(b);
