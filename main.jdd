@@ -1,3 +1,7 @@
 import String;
 
 println("hi".concat("cc"));
+println("hi".getIndexFromChar("h"));
+println("hi".getCharFromIndex(0));
+println("hi".getCharFromIndex(1));
+println("hi".getCharFromIndex(2));
