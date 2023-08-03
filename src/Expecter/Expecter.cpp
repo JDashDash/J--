@@ -63,6 +63,7 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
             JDD::Definition::Value v;
             v.content = "";
             v.type = JDD::Definition::Types::STRING;
+            current++;
             return v;
         }
     }
