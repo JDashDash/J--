@@ -1,7 +1,10 @@
 import String;
 
-println("hi".concat("cc"));
-println("hi".getIndexFromChar("h"));
-println("hi".getCharFromIndex(0));
-println("hi".getCharFromIndex(1));
-println("hi".getCharFromIndex(2));
+println("".isEmpty());
+println("c".isEmpty());
+println("cc".isEmpty());
+println("CC".toLowerCase());
+println("CC".toUpperCase());
+println("cc".toUpperCase());
+println("ccaa bb".replace("a", "b"));
+println("ccaa bb".replace("b", "a"));
