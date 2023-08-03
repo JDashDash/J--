@@ -19,4 +19,6 @@ add_executable(JDashDash
         src/Definitions/Value/Value.h
         src/Definitions/Variables/Variables.cpp
         src/Definitions/Variables/Variables.h
+        src/Modules/String.h
+        src/Modules/String.cpp
 )
