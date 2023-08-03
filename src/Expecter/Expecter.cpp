@@ -15,20 +15,20 @@ std::optional<JDD::Lexer::Token> ExpectOperator(std::vector<JDD::Lexer::Token>::
 }
 
 std::optional<JDD::Definition::Types> ExpectType(std::vector<JDD::Lexer::Token>::const_iterator& current) {
-    switch (current->type) {
-        case JDD::Lexer::INT:
+    if (current->type == JDD::Lexer::IDENTIFIANT) {
+        if (current->content == "int") {
+            ++current;
             return JDD::Definition::Types::INT;
-        case JDD::Lexer::DOUBLE:
+        } else if (current->content == "double") {
+            ++current;
             return JDD::Definition::Types::DOUBLE;
-        case JDD::Lexer::STRING:
+        } else if (current->content == "string") {
+            ++current;
             return JDD::Definition::Types::STRING;
-        case JDD::Lexer::IDENTIFIANT:
-            if (current->content == "true" || current->content == "false") {
-                return JDD::Definition::Types::BOOLEAN;
-            }
-            break;
-        default:
-            break;
+        } else if (current->content == "boolean") {
+            ++current;
+            return JDD::Definition::Types::BOOLEAN;
+        }
     }
     return std::nullopt;
 }
