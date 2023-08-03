@@ -8,7 +8,9 @@ std::optional<JDD::Lexer::Token> ExpectIdentifiant(std::vector<JDD::Lexer::Token
 }
 
 std::optional<JDD::Lexer::Token> ExpectOperator(std::vector<JDD::Lexer::Token>::const_iterator& current, std::string_view o) {
-    if (current->type == JDD::Lexer::OPERATOR || (current->type == JDD::Lexer::OPERATOR && current->content == o)) {
+    if (current->type == JDD::Lexer::OPERATOR && o.empty()) {
+        return *(current++);
+    } else if (current->type == JDD::Lexer::OPERATOR && !o.empty() && current->content == o) {
         return *(current++);
     }
     return std::nullopt;
@@ -17,16 +19,16 @@ std::optional<JDD::Lexer::Token> ExpectOperator(std::vector<JDD::Lexer::Token>::
 std::optional<JDD::Definition::Types> ExpectType(std::vector<JDD::Lexer::Token>::const_iterator& current) {
     if (current->type == JDD::Lexer::IDENTIFIANT) {
         if (current->content == "int") {
-            ++current;
+            current++;
             return JDD::Definition::Types::INT;
         } else if (current->content == "double") {
-            ++current;
+            current++;
             return JDD::Definition::Types::DOUBLE;
         } else if (current->content == "string") {
-            ++current;
+            current++;
             return JDD::Definition::Types::STRING;
         } else if (current->content == "boolean") {
-            ++current;
+            current++;
             return JDD::Definition::Types::BOOLEAN;
         }
     }
@@ -50,13 +52,18 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
             v.type = JDD::Definition::Types::BOOLEAN;
         }
 
-        ++current;
+        current++;
         return v;
     } else if (current->type == JDD::Lexer::IDENTIFIANT) {
         if (data.isVariable(current->content)) {
             auto var = data.getVariable(current->content);
-            ++current;
+            current++;
             return var->value;
+        } else if (current->content == "String") { // String Module
+            JDD::Definition::Value v;
+            v.content = "";
+            v.type = JDD::Definition::Types::STRING;
+            return v;
         }
     }
 
