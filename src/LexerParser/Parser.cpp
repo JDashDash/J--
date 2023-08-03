@@ -21,6 +21,9 @@ namespace JDD::Parser {
         } else if (instruction.has_value() && instruction->content == "println") {
             print(current, true, data);
             return true;
+        } else if (instruction.has_value() && instruction->content == "assert_eq") {
+            assert_eq(current, data);
+            return true;
         } else if (instruction.has_value() && (instruction->content == "int" || instruction->content == "double" ||
                                                instruction->content == "string" || instruction->content == "boolean"
                                                || instruction->content == "final")) {
@@ -67,6 +70,35 @@ namespace JDD::Parser {
 
         if (jumpLine) { std::cout << "\n"; }
         std::cout << content;
+    }
+
+     void JDDParser::assert_eq(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data) {
+        auto openValues = ExpectOperator(current, "(");
+        if (!openValues.has_value())
+            std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
+
+        auto value = ExpectValue(current, data);
+        if (!value.has_value())
+            std::cerr << "Forgot to give value in print" << std::endl;
+
+        auto separator = ExpectOperator(current, ",");
+        if (!separator.has_value())
+            std::cerr << "Forgot to separate the two arguments with ','" << std::endl;
+
+        auto lastValue = ExpectValue(current, data);
+        if (!lastValue.has_value())
+            std::cerr << "Forgot to give last value in print" << std::endl;
+
+        if (!ExpectOperator(current, ")").has_value())
+            std::cerr << "Forgot to close with ')'" << std::endl;
+
+        if (!ExpectOperator(current, ";").has_value())
+            std::cerr << "Forgot to close the instruction with ';'" << std::endl;
+
+        if (value->content != lastValue->content) {
+            std::cerr << "The first value is not equal to the second" << std::endl;
+            exit(1);
+        }
     }
 
     void JDDParser::variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data& data) {
