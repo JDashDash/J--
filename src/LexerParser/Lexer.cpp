@@ -189,7 +189,7 @@ namespace  JDD::Lexer {
 
     void Builder::OverToken(Token &token, std::vector<Token> &tokenList) {
         if (token.type == COMMENT) {
-            std::cout << "Comment found: " <<  token.content << std::endl;
+            //std::cout << "Comment found: " <<  token.content << std::endl;
         }
         else if (token.type != WHITESPACE) {
             tokenList.push_back(token);
