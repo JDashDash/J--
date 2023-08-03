@@ -7,6 +7,7 @@ namespace JDD::Definition {
         INT,
         DOUBLE,
         BOOLEAN,
-        STRING
+        STRING,
+        FINAL_NotType
     };
 }
