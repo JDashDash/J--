@@ -16,3 +16,8 @@ JDD::Definition::Variable::Variable(std::string name, JDD::Definition::Value val
     this->value = std::move(value);
     this->isFinal = isFinal;
 }
+
+std::ostream &JDD::Definition::operator<<(std::ostream &flux, const JDD::Definition::Variable &var) {
+    flux << "(Variable: " << var.name << ", " << var.value.content << ", " << var.isFinal << ")";
+    return flux;
+}

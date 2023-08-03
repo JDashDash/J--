@@ -16,5 +16,7 @@ namespace JDD::Definition {
         Value value;
         Types type;
         bool isFinal = false;
+
+        friend std::ostream& operator<<(std::ostream& flux, Variable const& var);
     };
 }
