@@ -62,54 +62,40 @@ namespace JDD::Parser {
     }
 
     void JDDParser::variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data& data) {
+        std::optional<Definition::Types> var_type = type;
         if (type == Definition::FINAL_NotType) {
-            auto var_type = ExpectType(current);
-            if (!var_type.has_value())
+            var_type = ExpectType(current);
+            if (!var_type.has_value()) {
                 std::cerr << "forgot to give a type to your variable" << std::endl;
-
-            auto var_name = ExpectIdentifiant(current);
-            if (!var_name.has_value())
-                std::cerr << "forgot to give a name to your variable" << std::endl;
-
-            if (!ExpectOperator(current, "=").has_value())
-                std::cerr << "forgot to introduce the value of your variable" << std::endl;
-
-            auto var_value = ExpectValue(current, data);
-            if (!var_value.has_value())
-                std::cerr << "forgot to give value to your variable" << std::endl;
-
-            if (!ExpectOperator(current, ";").has_value())
-                std::cerr << "forgot to close the instruction with ';'" << std::endl;
-
-            if (var_type != var_value->type)
-                std::cerr << "The variable type is not valid for the value type" << std::endl;
-
-            Definition::Variable variable(var_name->content, var_value.value(), var_type.value(), true);
-            data.pushVariable(variable);
-        } else {
-            auto var_type = type;
-
-            auto var_name = ExpectIdentifiant(current);
-            if (!var_name.has_value())
-                std::cerr << "forgot to give a name to your variable" << std::endl;
-
-            if (!ExpectOperator(current, "=").has_value())
-                std::cerr << "forgot to introduce the value of your variable" << std::endl;
-
-            auto var_value = ExpectValue(current, data);
-            if (!var_value.has_value())
-                std::cerr << "forgot to give value to your variable" << std::endl;
-
-            if (!ExpectOperator(current, ";").has_value())
-                std::cerr << "forgot to close the instruction with ';'" << std::endl;
-
-            if (var_type != var_value->type)
-                std::cerr << "The variable type is not valid for the value type" << std::endl;
-
-            Definition::Variable variable(var_name->content, var_value.value(), var_type);
-            data.pushVariable(variable);
+            }
         }
+
+        auto var_name = ExpectIdentifiant(current);
+        if (!var_name.has_value()) {
+            std::cerr << "forgot to give a name to your variable" << std::endl;
+        }
+
+        if (!ExpectOperator(current, "=").has_value()) {
+            std::cerr << "forgot to introduce the value of your variable" << std::endl;
+        }
+
+        auto var_value = ExpectValue(current, data);
+        if (!var_value.has_value()) {
+            std::cerr << "forgot to give value to your variable" << std::endl;
+        }
+
+        if (!ExpectOperator(current, ";").has_value()) {
+            std::cerr << "forgot to close the instruction with ';'" << std::endl;
+        }
+
+        if (var_type != var_value->type) {
+            std::cerr << "The variable type is not valid for the value type" << std::endl;
+        }
+
+        Definition::Variable variable(var_name->content, var_value.value(), var_type.value(), type == Definition::FINAL_NotType);
+        data.pushVariable(variable);
     }
+
 
     bool JDDParser::callInTheVoid(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data) {
         if (data.isVariable(current->content)) {
