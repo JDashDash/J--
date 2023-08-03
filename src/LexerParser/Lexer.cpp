@@ -72,7 +72,7 @@ namespace  JDD::Lexer {
                     if (current.type == INT) {
                         current.type = POSSIBLE_DOUBLE;
                         current.content.append(1, element);
-                    } else if (current.type == WHITESPACE) {
+                    } else if (current.type == WHITESPACE || current.type == IDENTIFIANT) {
                         OverToken(current, tokenList);
                         current.type = OPERATOR;
                         current.content.append(1,element);
