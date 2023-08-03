@@ -14,7 +14,7 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
                 std::cerr << "Request string to use the module and concat function" << std::endl;
 
-            content += JDD::Modules::String::concat(value->content, stringV->content);
+            content = JDD::Modules::String::concat(content, stringV->content);
         } else if (functionString->content == "getIndexFromChar") {
             auto stringV = ExpectValue(current, data);
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
@@ -32,8 +32,7 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
                 std::cerr << "Request string to use the module and equals function" << std::endl;
 
-            std::string beforeapply;
-            beforeapply = std::to_string(JDD::Modules::String::equals(value->content, stringV->content));
+            std::string beforeapply  = std::to_string(JDD::Modules::String::equals(value->content, stringV->content));
             if (beforeapply == "1") {
                 content += "true";
             } else {
@@ -44,25 +43,23 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
                 std::cerr << "Request string to use the module and equalsIgnoreCase function" << std::endl;
 
-            std::string beforeapply;
-            beforeapply = std::to_string(JDD::Modules::String::equalsIgnoreCase(value->content, stringV->content));
+            std::string beforeapply = std::to_string(JDD::Modules::String::equalsIgnoreCase(value->content, stringV->content));
             if (beforeapply == "1") {
                 content += "true";
             } else {
                 content += "false";
             }
         } else if (functionString->content == "isEmpty") {
-            std::string beforeapply;
-            beforeapply = std::to_string(JDD::Modules::String::isEmpty(value->content));
+            std::string beforeapply = std::to_string(JDD::Modules::String::isEmpty(value->content));
             if (beforeapply == "1") {
                 content += "true";
             } else {
                 content += "false";
             }
         } else if (functionString->content == "toLowerCase") {
-            content = JDD::Modules::String::toLowerCase(value->content);
+            content = JDD::Modules::String::toLowerCase(content);
         } else if (functionString->content == "toUpperCase") {
-            content = JDD::Modules::String::toUpperCase(value->content);
+            content = JDD::Modules::String::toUpperCase(content);
         } else if (functionString->content == "replace") {
             auto stringV = ExpectValue(current, data);
             if (!stringV.has_value() || stringV.value().type != JDD::Definition::STRING)
