@@ -60,15 +60,16 @@ namespace JDD::Parser {
         }
 
         content = value->content;
+
         while (true) {
             if (ExpectOperator(current, ".").has_value() && value->type == Definition::STRING && data.isStringModuleImported) {
                 JDD::Modules::ModulesManager::useStringModule(current, data, content, value);
             } else if (ExpectOperator(current, "+").has_value()) {
-                auto nextValue = ExpectValue(current, data);
-                if (!nextValue.has_value()) {
+                value = ExpectValue(current, data);
+                if (!value.has_value()) {
                     std::cerr << "Specify the next value for concatenation" << std::endl;
                 }
-                content += nextValue->content;
+                content += value->content;
             } else {
                 break;
             }
