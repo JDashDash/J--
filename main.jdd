@@ -1,10 +1,3 @@
 import String;
 
-println("hi, ".concat("cc -> ").concat("cc 1"));
-println("hi, ".concat("cc -> ").concat("cc 1").toUpperCase());
-println("hi, ".concat("Cc -> ").concat("cC 1"));
-println("hi, ".concat("Cc -> ").concat("cC 1").toLowerCase());
-
-boolean d = false;
-println("hi" + ", cc, " + 50 + ", what?" + String.valueOf(d));
-println("cc".concat(", bye") + ", well no");
+println("lol".toUpperCase() + ", cc," + "HI".toLowerCase() );
