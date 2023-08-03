@@ -7,8 +7,8 @@ std::optional<JDD::Lexer::Token> ExpectIdentifiant(std::vector<JDD::Lexer::Token
     return std::nullopt;
 }
 
-std::optional<JDD::Lexer::Token> ExpectOperator(std::vector<JDD::Lexer::Token>::const_iterator& current, std::string_view o ) {
-    if (current->type == JDD::Lexer::OPERATOR || (current->type == JDD::Lexer::OPERATOR && current->content == o )) {
+std::optional<JDD::Lexer::Token> ExpectOperator(std::vector<JDD::Lexer::Token>::const_iterator& current, std::string_view o) {
+    if (current->type == JDD::Lexer::OPERATOR || (current->type == JDD::Lexer::OPERATOR && current->content == o)) {
         return *(current++);
     }
     return std::nullopt;
