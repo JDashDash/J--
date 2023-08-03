@@ -1,5 +1,15 @@
 import String;
 
+println("hi".concat("cc"));
+println("hi".getIndexFromChar("h"));
+println("hi".getCharFromIndex(0));
+println("hi".getCharFromIndex(1));
+println("hi".getCharFromIndex(2)); // Return void because it does not exist
+println("hi".equals("hi"));
+println("hi".equals("Hi"));
+println("hi".equalsIgnoreCase("hi"));
+println("hi".equalsIgnoreCase("hI"));
+println("hi".equalsIgnoreCase("HI"));
 println("".isEmpty());
 println("c".isEmpty());
 println("cc".isEmpty());
