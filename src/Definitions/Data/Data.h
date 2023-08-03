@@ -15,5 +15,6 @@ namespace JDD::Definition {
         bool isVariable(const std::string& name);
         std::optional<Variable> getVariable(const std::string& name);
         void pushVariable(const Variable& var);
+        void updateValueOfVariable(const std::string& name, const std::string& value);
     };
 }
