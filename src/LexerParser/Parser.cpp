@@ -1,8 +1,6 @@
 #include "Parser.h"
 
 namespace JDD::Parser {
-
-
     void JDDParser::main(const std::vector<JDD::Lexer::Token>& tokenList) {
         Definition::Data data;
         auto current_token = tokenList.begin();
