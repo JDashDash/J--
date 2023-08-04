@@ -55,12 +55,28 @@ namespace JDD::Parser {
         if (!openValues.has_value())
             std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
 
-        auto value = ExpectValue(current, data);
-        if (!value.has_value())
-            std::cerr << "Forgot to give value in print" << std::endl;
+        std::string content;
 
-        std::string content = value->content;
-        JDD::Modules::ModulesManager::useStringModule(current, data, content, value);
+        auto value = ExpectValue(current, data);
+        if (!value.has_value()) {
+            std::cerr << "Specify a value" << std::endl;
+        }
+
+        content = value->content;
+
+        while (true) {
+            if (ExpectOperator(current, ".").has_value() && value->type == Definition::STRING && data.isStringModuleImported) {
+                JDD::Modules::ModulesManager::useStringModule(current, data, content, value);
+            } else if (ExpectOperator(current, "+").has_value()) {
+                value = ExpectValue(current, data);
+                if (!value.has_value()) {
+                    std::cerr << "Specify the next value for concatenation" << std::endl;
+                }
+                content += value->content;
+            } else {
+                break;
+            }
+        }
 
         if (!ExpectOperator(current, ")").has_value())
             std::cerr << "Forgot to close with ')'" << std::endl;
@@ -100,6 +116,7 @@ namespace JDD::Parser {
             exit(1);
         }
     }
+    
 
     void JDDParser::variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data& data) {
         std::optional<Definition::Types> var_type = type;
@@ -112,6 +129,9 @@ namespace JDD::Parser {
         auto var_name = ExpectIdentifiant(current);
         if (!var_name.has_value())
             std::cerr << "Forgot to give a name to your variable" << std::endl;
+
+        if (var_name->content == "String")
+            std::cerr << "Dot not give the name of a module" << std::endl;
 
         if (!ExpectOperator(current, "=").has_value())
             std::cerr << "Forgot to introduce the value of your variable" << std::endl;
@@ -153,17 +173,14 @@ namespace JDD::Parser {
 
     void JDDParser::import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data) {
         auto possibleModule = ExpectIdentifiant(current);
-        if (!possibleModule.has_value()) {
-            /* For file, WIP
-            auto possibleFile = ExpectValue(current, data);
-            */
-        }
+        if (!possibleModule.has_value())
+            std::cerr << "Specify a module" << std::endl;
 
         if (possibleModule.has_value() && possibleModule->content == "String") {
             data.isStringModuleImported = true;
         }
 
         if (!ExpectOperator(current, ";").has_value())
-            std::cerr << "forgot to close the instruction with ';'" << std::endl;
+            std::cerr << "Forgot to close the instruction with ';'" << std::endl;
     }
 }

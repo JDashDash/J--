@@ -56,11 +56,15 @@ namespace JDD::Modules::String {
 
     std::string replace(const std::string& str1, char x, char y) {
         std::string s = str1;
-        for (size_t i = 0; i < s.length(); ++i) {
-            if (s[i] == x) {
-                s[i] = y;
+        for (char & i : s) {
+            if (i == x) {
+                i = y;
             }
         }
         return s;
+    }
+
+    std::string valueOf(std::string& string) {
+        return string;
     }
 }

@@ -44,6 +44,8 @@ int main(int argc, char** argv) {
 
     auto tokenList = JDD::Lexer::Builder::ParserTokens(code);
 
+    //for (auto const& e : tokenList) std::cout << e << std::endl;
+
     JDD::Parser::JDDParser::main(tokenList);
 
     return 0;
