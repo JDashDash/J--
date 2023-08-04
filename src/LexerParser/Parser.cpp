@@ -67,7 +67,7 @@ namespace JDD::Parser {
 
             content.push_back(nextStr);
 
-            if (ExpectOperator(current, "+").has_value()) {}
+            if (ExpectOperator(current, "+").has_value()) {} // Ignore, println("hi" + "cc"); == println("hi" "cc");
         }
 
         if (!ExpectOperator(current, ";").has_value())
