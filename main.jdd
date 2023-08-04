@@ -1,3 +1,3 @@
 import String;
 
-println("lol".toUpperCase() + ", cc," + "HI".toLowerCase() );
+println("aa ->" "cc".concat(" bye-bye").concat(", cc").toUpperCase() "( CC".toLowerCase());
