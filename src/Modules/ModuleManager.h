@@ -11,5 +11,5 @@
 #include "String/String.h"
 
 namespace JDD::Modules::ModulesManager {
-    void useStringModule(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data, std::string& content, std::optional<JDD::Definition::Value>& value);
+    void useStringModule(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data, std::string& content);
 }
