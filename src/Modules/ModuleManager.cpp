@@ -51,17 +51,18 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
         content = JDD::Modules::String::toUpperCase(content);
     } else if (functionString.has_value() && functionString->content == "replace") {
         auto firstChar = ExpectValue(current, data);
+
         if (!firstChar.has_value() || firstChar->type != Definition::STRING)
             std::cerr << "'replace' function need string value as first parameter" << std::endl;
+
+        if (!ExpectOperator(current, ",").has_value())
+            std::cerr << "Need ',' to give the next argument" << std::endl;
+
         auto secondChar = ExpectValue(current, data);
         if (!secondChar.has_value() || secondChar->type != Definition::STRING)
-            std::cerr << "'replace' function need string value as first parameter" << std::endl;
+            std::cerr << "'replace' function need string value as second parameter" << std::endl;
+
         content = JDD::Modules::String::replace(content, firstChar->content[0], secondChar->content[0]);
-        if (content == "1") {
-            content = "true";
-        } else {
-            content = "false";
-        }
     } else if (functionString.has_value() && functionString->content == "valueOf") {
         auto nextString = ExpectValue(current, data);
         if (!nextString.has_value())
