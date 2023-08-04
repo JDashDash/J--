@@ -12,13 +12,13 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
         auto nextString = ExpectValue(current, data);
         if (!nextString.has_value())
             std::cerr << "'concat' function need a value or can give a variable as first parameter" << std::endl;
-        content = content + nextString->content;
-    } if (functionString.has_value() && functionString->content == "getIndexFromChar") {
+        content = JDD::Modules::String::concat(content, nextString->content);
+    } else if (functionString.has_value() && functionString->content == "getIndexFromChar") {
         auto nextString = ExpectValue(current, data);
         if (!nextString.has_value() || nextString->type != Definition::STRING)
             std::cerr << "'getIndexFromChar' function need a string value as first parameter" << std::endl;
         content = std::to_string(JDD::Modules::String::getIndexFromChar(content, nextString->content[0]));
-    } if (functionString.has_value() && functionString->content == "getCharFromIndex") {
+    } else if (functionString.has_value() && functionString->content == "getCharFromIndex") {
         auto nextString = ExpectValue(current, data);
         if (!nextString.has_value() || nextString->type != Definition::INT)
             std::cerr << "'getCharFromIndex' function need a int value as first parameter" << std::endl;
@@ -67,8 +67,9 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
         if (!nextString.has_value())
             std::cerr << "'valueOf' function need a value or can give a variable as first parameter" << std::endl;
         content = nextString->content;
-    } else
-        std::cerr << "This function from String is not available" << std::endl;
+    } else {
+        std::cerr << "This function from String is not available (" << functionString->content << " does not exist)" << std::endl;
+    }
 
     if (!ExpectOperator(current, ")").has_value())
         std::cerr << "Close with ')' to conclude the operation(s)" << std::endl;
