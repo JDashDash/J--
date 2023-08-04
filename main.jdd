@@ -1,4 +1,4 @@
 import String;
 
 assert_eq(1, 1);
-println("lol".toUpperCase() + ", cc," + "HI".toLowerCase() );
+println("hi" + "cc");

@@ -55,37 +55,31 @@ namespace JDD::Parser {
         if (!openValues.has_value())
             std::cerr << "Forgot to open with '(' and make sure to close with ')'" << std::endl;
 
-        std::string content;
+        std::vector<std::string> content;
 
-        auto value = ExpectValue(current, data);
-        if (!value.has_value()) {
-            std::cerr << "Specify a value" << std::endl;
-        }
-
-        content = value->content;
-
-        while (true) {
-            if (ExpectOperator(current, ".").has_value() && value->type == Definition::STRING && data.isStringModuleImported) {
-                JDD::Modules::ModulesManager::useStringModule(current, data, content, value);
-            } else if (ExpectOperator(current, "+").has_value()) {
-                value = ExpectValue(current, data);
-                if (!value.has_value()) {
-                    std::cerr << "Specify the next value for concatenation" << std::endl;
-                }
-                content += value->content;
-            } else {
-                break;
+        while (!ExpectOperator(current, ")").has_value()) {
+            auto value = ExpectValue(current, data);
+            if (!value.has_value()) {
+                std::cerr << "Specify a value" << std::endl;
             }
-        }
 
-        if (!ExpectOperator(current, ")").has_value())
-            std::cerr << "Forgot to close with ')'" << std::endl;
+            std::string nextStr = value->content;
+            while (ExpectOperator(current, ".").has_value() && value->type == Definition::STRING && data.isStringModuleImported) {
+                JDD::Modules::ModulesManager::useStringModule(current, data, nextStr);
+            }
+
+            content.push_back(nextStr);
+
+            if (ExpectOperator(current, "+").has_value()) {} // Ignore, println("hi" + "cc"); == println("hi" "cc");
+        }
 
         if (!ExpectOperator(current, ";").has_value())
             std::cerr << "Forgot to close the instruction with ';'" << std::endl;
 
         if (jumpLine) { std::cout << "\n"; }
-        std::cout << content;
+        for (auto const& s : content) {
+            std::cout << s;
+        }
     }
 
      void JDDParser::assert_eq(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data) {
