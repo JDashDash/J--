@@ -99,7 +99,7 @@ namespace JDD::Parser {
 
         auto value = ExpectValue(current, data);
         if (!value.has_value())
-            std::cerr << "Forgot to give value in print" << std::endl;
+            std::cerr << "Forgot to give value of assert_eq" << std::endl;
 
         auto separator = ExpectOperator(current, ",");
         if (!separator.has_value())
@@ -107,7 +107,7 @@ namespace JDD::Parser {
 
         auto lastValue = ExpectValue(current, data);
         if (!lastValue.has_value())
-            std::cerr << "Forgot to give last value in print" << std::endl;
+            std::cerr << "Forgot to give last value of assert_eq" << std::endl;
 
         if (!ExpectOperator(current, ")").has_value())
             std::cerr << "Forgot to close with ')'" << std::endl;
