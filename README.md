@@ -1,8 +1,9 @@
 # J--
 
-![Downloads](https://img.shields.io/github/downloads/JDashDash/J--/total)
-![Code size](https://img.shields.io/github/languages/code-size/JDashDash/J--)
-![Last Release](https://img.shields.io/github/release/JDashDash/J--)
+[![Downloads](https://img.shields.io/github/downloads/JDashDash/J--/total?style=for-the-badge)](https://github.com/JDashDash/J--)
+[![Code size](https://img.shields.io/github/languages/code-size/JDashDash/J--?style=for-the-badge)](https://github.com/JDashDash/J--)
+[![Last Release](https://img.shields.io/github/release/JDashDash/J--?style=for-the-badge)](https://github.com/JDashDash/J--)
+
 
 ## Description
 

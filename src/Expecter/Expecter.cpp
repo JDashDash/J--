@@ -30,6 +30,12 @@ std::optional<JDD::Definition::Types> ExpectType(std::vector<JDD::Lexer::Token>:
         } else if (current->content == "boolean") {
             current++;
             return JDD::Definition::Types::BOOLEAN;
+        } else if (current->content == "final") {
+            current++;
+            return JDD::Definition::Types::FINAL_NotType;
+        } else if (current->content == "void") {
+            current++;
+            return JDD::Definition::Types::VOID;
         }
     }
     return std::nullopt;

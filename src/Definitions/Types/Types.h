@@ -8,6 +8,7 @@ namespace JDD::Definition {
         DOUBLE,
         BOOLEAN,
         STRING,
+        VOID,
         FINAL_NotType
     };
 }
