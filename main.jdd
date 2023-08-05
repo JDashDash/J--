@@ -1,3 +1,1 @@
-import String;
-
-println("hi" + "cc");
+protected final int a = 10;
