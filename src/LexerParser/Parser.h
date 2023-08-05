@@ -27,7 +27,8 @@ namespace JDD::Parser {
 
         // Instructions :
         static void print(std::vector<Lexer::Token>::const_iterator &current, bool jumpLine, Definition::Data& data);
-        static void variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data& data, Definition::VariableState state);
+        static void variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type,
+                              Definition::Data &data);
         static void import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data);
 
         // Special :

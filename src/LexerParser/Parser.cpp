@@ -27,15 +27,15 @@ namespace JDD::Parser {
                                                instruction->content == "string" || instruction->content == "boolean"
                                                || instruction->content == "final")) {
             if (instruction->content == "int")
-                variables(current, JDD::Definition::Types::INT, data, Definition::VarPrivate);
+                variables(current, JDD::Definition::Types::INT, data);
             else if (instruction->content == "double")
-                variables(current, JDD::Definition::Types::DOUBLE, data, Definition::VarPrivate);
+                variables(current, JDD::Definition::Types::DOUBLE, data);
             else if (instruction->content == "string")
-                variables(current, JDD::Definition::Types::STRING, data, Definition::VarPrivate);
+                variables(current, JDD::Definition::Types::STRING, data);
             else if (instruction->content == "boolean")
-                variables(current, JDD::Definition::Types::BOOLEAN, data, Definition::VarPrivate);
+                variables(current, JDD::Definition::Types::BOOLEAN, data);
             else
-                variables(current, JDD::Definition::Types::FINAL_NotType, data, Definition::VarPrivate);
+                variables(current, JDD::Definition::Types::FINAL_NotType, data);
             return true;
         } else if (instruction.has_value() && instruction->content == "import") {
             import(current, data);
@@ -89,7 +89,8 @@ namespace JDD::Parser {
         }
     }
 
-    void JDDParser::variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data& data, Definition::VariableState state) {
+    void JDDParser::variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type,
+                              Definition::Data &data) {
         std::optional<Definition::Types> var_type = type;
         if (type == Definition::FINAL_NotType) {
             var_type = ExpectType(current);
@@ -146,8 +147,7 @@ namespace JDD::Parser {
             std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
     }
 
-    void JDDParser::specialVariable_defineFunction(std::vector<Lexer::Token>::const_iterator &current,
-                                                   Definition::Data &data,
+    void JDDParser::specialVariable_defineFunction(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data,
                                                    std::vector<Lexer::Token> tokenList, Definition::FunctionState state) {
         auto type = ExpectType(current);
         if (!type.has_value())
@@ -228,7 +228,7 @@ namespace JDD::Parser {
         }
     }
 
-    void JDDParser::import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data) {
+    void JDDParser::import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data) {
         auto possibleModule = ExpectIdentifiant(current);
         if (!possibleModule.has_value())
             std::cerr << "Specify a module" << std::endl;
