@@ -8,10 +8,10 @@
 
 namespace JDD::Definition {
     class Data {
-    private:
+    public:
         std::map<std::string, Variable> Variables; // Variable Name, Variable Object
 
-    public:
+
         // Modules Enable
         bool isStringModuleImported = false;
         bool isBooleanModuleImported = false;
