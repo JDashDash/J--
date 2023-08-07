@@ -15,6 +15,7 @@ namespace JDD::Definition {
         // Modules Enable
         bool isStringModuleImported = false;
         bool isBooleanModuleImported = false;
+        bool isDoubleModuleImported = false;
 
         // Functions
         bool isVariable(const std::string& name);
