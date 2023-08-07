@@ -106,3 +106,27 @@ std::optional<JDD::Definition::Value> ExpectString(std::vector<JDD::Lexer::Token
     v.content = nextStr;
     return v;
 }
+
+std::optional<JDD::Definition::Value> ExpectInt(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data) {
+    auto possibleClassicValue = ExpectValue(current, data);
+    if (possibleClassicValue.has_value() && possibleClassicValue->type == JDD::Definition::INT)
+        return possibleClassicValue;
+
+    return std::nullopt;
+}
+
+std::optional<JDD::Definition::Value> ExpectDouble(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data) {
+    auto possibleClassicValue = ExpectValue(current, data);
+    if (possibleClassicValue.has_value() && possibleClassicValue->type == JDD::Definition::DOUBLE)
+        return possibleClassicValue;
+
+    return std::nullopt;
+}
+
+std::optional<JDD::Definition::Value> ExpectBoolean(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data) {
+    auto possibleClassicValue = ExpectValue(current, data);
+    if (possibleClassicValue.has_value() && possibleClassicValue->type == JDD::Definition::BOOLEAN)
+        return possibleClassicValue;
+
+    return std::nullopt;
+}
