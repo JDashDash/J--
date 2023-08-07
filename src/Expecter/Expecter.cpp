@@ -87,6 +87,10 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
             while (ExpectOperator(current, ".").has_value() && data.isDoubleModuleImported) {
                 JDD::Modules::ModulesManager::useDoubleModule(current, data, v);
             }
+        } else if (v.type == JDD::Definition::Types::INT) {
+            while (ExpectOperator(current, ".").has_value() && data.isIntegerModuleImported) {
+                JDD::Modules::ModulesManager::useIntegerModule(current, data, v);
+            }
         }
 
         return v;
@@ -107,6 +111,10 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
                 v.type = JDD::Definition::Types::DOUBLE;
                 while (ExpectOperator(current, ".").has_value() && data.isDoubleModuleImported)
                     JDD::Modules::ModulesManager::useDoubleModule(current, data, v);
+            } else if (var->type == JDD::Definition::Types::INT) {
+                v.type = JDD::Definition::Types::INT;
+                while (ExpectOperator(current, ".").has_value() && data.isIntegerModuleImported)
+                    JDD::Modules::ModulesManager::useIntegerModule(current, data, v);
             }
             return v;
         } else if (current->content == "String") { // String Module without any value (variable value or classic value)
@@ -127,13 +135,22 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
                 JDD::Modules::ModulesManager::useBooleanModule(current, data, v);
             }
             return v;
-        } else if (current->content == "Double") { // Boolean Module without any value (variable value or classic value)
+        } else if (current->content == "Double") { // Double Module without any value (variable value or classic value)
             JDD::Definition::Value v;
             v.content = "";
             v.type = JDD::Definition::Types::DOUBLE;
             current++;
             while (ExpectOperator(current, ".").has_value() && data.isDoubleModuleImported) {
                 JDD::Modules::ModulesManager::useDoubleModule(current, data, v);
+            }
+            return v;
+        } else if (current->content == "Integer") { // Integer Module without any value (variable value or classic value)
+            JDD::Definition::Value v;
+            v.content = "";
+            v.type = JDD::Definition::Types::INT;
+            current++;
+            while (ExpectOperator(current, ".").has_value() && data.isIntegerModuleImported) {
+                JDD::Modules::ModulesManager::useIntegerModule(current, data, v);
             }
             return v;
         }
