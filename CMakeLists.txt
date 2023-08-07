@@ -29,4 +29,6 @@ add_executable(JDashDash
         src/Modules/Boolean/Boolean.h
         src/Modules/Double/Double.cpp
         src/Modules/Double/Double.h
+        src/Modules/Integer/Integer.cpp
+        src/Modules/Integer/Integer.h
 )
