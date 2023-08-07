@@ -45,14 +45,9 @@ std::optional<JDD::Definition::Types> ExpectType(std::vector<JDD::Lexer::Token>:
 std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data) {
     if (current->type == JDD::Lexer::INT || current->type == JDD::Lexer::DOUBLE || current->type == JDD::Lexer::STRING ||
         (current->type == JDD::Lexer::IDENTIFIANT && (current->content == "true" || current->content == "false"))) {
-
         JDD::Definition::Value v;
         v.content = current->content;
-
         if (current->type == JDD::Lexer::STRING) {
-            while (ExpectOperator(current, ".").has_value() && data.isStringModuleImported) {
-                JDD::Modules::ModulesManager::useStringModule(current, data, v.content);
-            }
             v.type = JDD::Definition::Types::STRING;
         } else if (current->type == JDD::Lexer::INT) {
             v.type = JDD::Definition::Types::INT;
@@ -61,22 +56,33 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
         } else if (current->type == JDD::Lexer::IDENTIFIANT) {
             v.type = JDD::Definition::Types::BOOLEAN;
         }
-
         current++;
+
+        while (ExpectOperator(current, ".").has_value() && data.isStringModuleImported) {
+            JDD::Modules::ModulesManager::useStringModule(current, data, v.content);
+        }
+
         return v;
     } else if (current->type == JDD::Lexer::IDENTIFIANT) {
         if (data.isVariable(current->content)) {
             auto var = data.getVariable(current->content);
+            JDD::Definition::Value v = var->value;
             current++;
-            return var->value;
+            if (var->type == JDD::Definition::STRING) {
+                v.type = JDD::Definition::Types::STRING;
+                while (ExpectOperator(current, ".").has_value() && data.isStringModuleImported) {
+                    JDD::Modules::ModulesManager::useStringModule(current, data, v.content);
+                }
+            }
+            return v;
         } else if (current->content == "String") { // String Module
             JDD::Definition::Value v;
             v.content = "";
+            v.type = JDD::Definition::Types::STRING;
+            current++;
             while (ExpectOperator(current, ".").has_value() && data.isStringModuleImported) {
                 JDD::Modules::ModulesManager::useStringModule(current, data, v.content);
             }
-            v.type = JDD::Definition::Types::STRING;
-            current++;
             return v;
         }
     }
