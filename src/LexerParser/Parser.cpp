@@ -227,9 +227,11 @@ namespace JDD::Parser {
         if (!possibleModule.has_value())
             std::cerr << "Specify a module" << std::endl;
 
-        if (possibleModule.has_value() && possibleModule->content == "String") {
+        if (possibleModule.has_value() && possibleModule->content == "String")
             data.isStringModuleImported = true;
-        }
+        else if (possibleModule.has_value() && possibleModule->content == "Boolean")
+            data.isBooleanModuleImported = true;
+
 
         if (!ExpectOperator(current, ";").has_value())
             std::cerr << "Forgot to close the instruction with ';'" << std::endl;
