@@ -1,6 +1,6 @@
 #include "Data.h"
 
-bool JDD::Definition::Data::isVariable(const std::string& name) {
+bool JDD::Definition::Data::isVariable(const std::string& name) const {
     if (this->Variables.contains(name))
         return true;
     return false;
@@ -21,4 +21,20 @@ void JDD::Definition::Data::updateValueOfVariable(const std::string &name, const
         auto var = this->getVariable(name);
         this->Variables[var->name].value.content = value;
     }
+}
+
+void JDD::Definition::Data::pushFunction(const JDD::Definition::Function &func) {
+    this->Functions[func.name] = func;
+}
+
+bool JDD::Definition::Data::isFunction(const std::string &name) const {
+    if (this->Functions.contains(name))
+        return true;
+    return false;
+}
+
+std::optional<JDD::Definition::Function> JDD::Definition::Data::getFunction(const std::string &name) {
+    if (isFunction(name))
+        return this->Functions[name];
+    return std::nullopt;
 }
