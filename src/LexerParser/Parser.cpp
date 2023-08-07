@@ -65,11 +65,11 @@ namespace JDD::Parser {
         std::vector<std::string> content;
 
         while (!ExpectOperator(current, ")").has_value()) {
-            auto value = ExpectString(current, data);
-            if (!value.has_value())
-                std::cerr << "Specify a value" << std::endl;
 
-            content.push_back(value->content);
+            auto string = ExpectValue(current, data);
+            if (!string.has_value())
+                std::cerr << "Specify a value" << std::endl;
+            content.push_back(string->content);
 
             if (ExpectOperator(current, "+").has_value()) {} // Ignore, println("hi" + "cc"); == println("hi" "cc");
         }
