@@ -1,5 +1,6 @@
 #include "ModuleManager.h"
 #include "Boolean/Boolean.h"
+#include "Double/Double.h"
 
 void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data, Definition::Value& value) {
     auto functionString = ExpectIdentifiant(current);
@@ -80,6 +81,8 @@ void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token
         std::cerr << "Close with ')' to conclude the operation(s)" << std::endl;
 }
 
+
+
 void JDD::Modules::ModulesManager::useBooleanModule(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data, Definition::Value& value) {
     auto functionString = ExpectIdentifiant(current);
     if (!functionString.has_value())
@@ -136,6 +139,107 @@ void JDD::Modules::ModulesManager::useBooleanModule(std::vector<JDD::Lexer::Toke
         if (value.content == "1") value.content = "true";
         else value.content = "false";
         
+    } else
+        std::cerr << "This function from String is not available (" << functionString->content << " does not exist)" << std::endl;
+
+
+    if (!ExpectOperator(current, ")").has_value())
+        std::cerr << "Close with ')' to conclude the operation(s)" << std::endl;
+}
+
+
+
+void JDD::Modules::ModulesManager::useDoubleModule(std::vector<JDD::Lexer::Token>::const_iterator &current,
+                                                   JDD::Definition::Data &data, Definition::Value &value) {
+    auto functionString = ExpectIdentifiant(current);
+    if (!functionString.has_value())
+        std::cerr << "Specify a function from String module" << std::endl;
+
+    if (!ExpectOperator(current, "(").has_value())
+        std::cerr << "Open '()' to give arguments to the function" << std::endl;
+
+    if (functionString.has_value() && functionString->content == "min") {
+        auto firstValue = ExpectValue(current, data);
+        if (!firstValue.has_value() || firstValue->type != Definition::DOUBLE)
+            std::cerr << "'min' function need a double value as first parameter" << std::endl;
+
+        if (!ExpectOperator(current, ",").has_value())
+            std::cerr << "Need ',' to separate parameters in 'min'" << std::endl;
+
+        auto secondValue = ExpectValue(current, data);
+        if (!secondValue.has_value() || secondValue->type != Definition::DOUBLE)
+            std::cerr << "'min' function need a double value as second parameter" << std::endl;
+
+        value.content = std::to_string(JDD::Modules::Double::min(std::stod(firstValue->content), std::stod(secondValue->content)));
+    } else if (functionString.has_value() && functionString->content == "max") {
+        auto firstValue = ExpectValue(current, data);
+        if (!firstValue.has_value() || firstValue->type != Definition::DOUBLE)
+            std::cerr << "'max' function need a double value as first parameter" << std::endl;
+
+        if (!ExpectOperator(current, ",").has_value())
+            std::cerr << "Need ',' to separate parameters in 'max'" << std::endl;
+
+        auto secondValue = ExpectValue(current, data);
+        if (!secondValue.has_value() || secondValue->type != Definition::DOUBLE)
+            std::cerr << "'max' function need a double value as second parameter" << std::endl;
+
+        value.content = std::to_string(JDD::Modules::Double::max(std::stod(firstValue->content), std::stod(secondValue->content)));
+    } else if (functionString.has_value() && functionString->content == "sum") {
+        auto firstValue = ExpectValue(current, data);
+        if (!firstValue.has_value() || firstValue->type != Definition::DOUBLE)
+            std::cerr << "'sum' function need a double value as first parameter" << std::endl;
+
+        if (ExpectOperator(current, ",").has_value()) {
+            auto secondValue = ExpectValue(current, data);
+            if (!secondValue.has_value() || secondValue->type != Definition::DOUBLE)
+                std::cerr << "'sum' function need a double value as second parameter" << std::endl;
+
+            value.content = std::to_string(JDD::Modules::Double::sum(std::stod(firstValue->content), std::stod(secondValue->content)));
+        } else {
+            value.content = std::to_string(JDD::Modules::Double::sum(std::stod(value.content), std::stod(firstValue->content)));
+        }
+    } else if (functionString.has_value() && functionString->content == "sub") {
+        auto firstValue = ExpectValue(current, data);
+        if (!firstValue.has_value() || firstValue->type != Definition::DOUBLE)
+            std::cerr << "'sub' function need a double value as first parameter" << std::endl;
+
+        if (ExpectOperator(current, ",").has_value()) {
+            auto secondValue = ExpectValue(current, data);
+            if (!secondValue.has_value() || secondValue->type != Definition::DOUBLE)
+                std::cerr << "'sub' function need a double value as second parameter" << std::endl;
+
+            value.content = std::to_string(JDD::Modules::Double::sub(std::stod(firstValue->content), std::stod(secondValue->content)));
+        } else {
+            value.content = std::to_string(JDD::Modules::Double::sub(std::stod(value.content), std::stod(firstValue->content)));
+        }
+    } else if (functionString.has_value() && functionString->content == "mul") {
+        auto firstValue = ExpectValue(current, data);
+        if (!firstValue.has_value() || firstValue->type != Definition::DOUBLE)
+            std::cerr << "'mul' function need a double value as first parameter" << std::endl;
+
+        if (ExpectOperator(current, ",").has_value()) {
+            auto secondValue = ExpectValue(current, data);
+            if (!secondValue.has_value() || secondValue->type != Definition::DOUBLE)
+                std::cerr << "'mul' function need a double value as second parameter" << std::endl;
+
+            value.content = std::to_string(JDD::Modules::Double::mul(std::stod(firstValue->content), std::stod(secondValue->content)));
+        } else {
+            value.content = std::to_string(JDD::Modules::Double::mul(std::stod(value.content), std::stod(firstValue->content)));
+        }
+    } else if (functionString.has_value() && functionString->content == "div") {
+        auto firstValue = ExpectValue(current, data);
+        if (!firstValue.has_value() || firstValue->type != Definition::DOUBLE)
+            std::cerr << "'div' function need a double value as first parameter" << std::endl;
+
+        if (ExpectOperator(current, ",").has_value()) {
+            auto secondValue = ExpectValue(current, data);
+            if (!secondValue.has_value() || secondValue->type != Definition::DOUBLE)
+                std::cerr << "'div' function need a double value as second parameter" << std::endl;
+
+            value.content = std::to_string(JDD::Modules::Double::div(std::stod(firstValue->content), std::stod(secondValue->content)));
+        } else {
+            value.content = std::to_string(JDD::Modules::Double::div(std::stod(value.content), std::stod(firstValue->content)));
+        }
     } else
         std::cerr << "This function from String is not available (" << functionString->content << " does not exist)" << std::endl;
 
