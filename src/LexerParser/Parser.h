@@ -23,7 +23,8 @@ namespace JDD::Parser {
 
     private:
         // Essentials:
-        static bool ManagerInstruction(std::vector<Lexer::Token>::const_iterator& current, Definition::Data& data, std::vector<Lexer::Token> tokenList);
+        static Definition::Data executeBlocCode(const std::vector<JDD::Lexer::Token>& tokenList, Definition::Data& old_data);
+        static bool ManagerInstruction(std::vector<Lexer::Token>::const_iterator& current, Definition::Data& data, std::vector<Lexer::Token> tokenList, bool classicExecution);
 
         // Instructions :
         static void print(std::vector<Lexer::Token>::const_iterator &current, bool jumpLine, Definition::Data& data);
@@ -32,7 +33,7 @@ namespace JDD::Parser {
         static void import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data);
 
         // Special :
-        static void updateVariableValue(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data, const std::string& var_name);
+        static void callOrVariableManagement(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data, const std::string& var_name);
 
         static void
         specialVariable_defineFunction(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data,
