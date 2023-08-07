@@ -65,17 +65,11 @@ namespace JDD::Parser {
         std::vector<std::string> content;
 
         while (!ExpectOperator(current, ")").has_value()) {
-            auto value = ExpectValue(current, data);
-            if (!value.has_value()) {
+            auto value = ExpectString(current, data);
+            if (!value.has_value())
                 std::cerr << "Specify a value" << std::endl;
-            }
 
-            std::string nextStr = value->content;
-            while (ExpectOperator(current, ".").has_value() && value->type == Definition::STRING && data.isStringModuleImported) {
-                JDD::Modules::ModulesManager::useStringModule(current, data, nextStr);
-            }
-
-            content.push_back(nextStr);
+            content.push_back(value->content);
 
             if (ExpectOperator(current, "+").has_value()) {} // Ignore, println("hi" + "cc"); == println("hi" "cc");
         }
