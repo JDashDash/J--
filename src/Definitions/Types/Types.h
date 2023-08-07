@@ -11,4 +11,13 @@ namespace JDD::Definition {
         VOID,
         FINAL_NotType
     };
+
+    inline constexpr const char *sAllTypes[] {
+            "INT",
+            "DOUBLE",
+            "BOOLEAN",
+            "STRING",
+            "VOID",
+            "FINAL_NotType"
+    };
 }
