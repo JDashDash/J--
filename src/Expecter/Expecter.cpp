@@ -1,4 +1,5 @@
 #include "Expecter.h"
+#include "../Modules/ModuleManager.h"
 
 std::optional<JDD::Lexer::Token> ExpectIdentifiant(std::vector<JDD::Lexer::Token>::const_iterator& current) {
     if (current->type == JDD::Lexer::IDENTIFIANT) {
@@ -75,4 +76,33 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
     }
 
     return std::nullopt;
+}
+
+std::optional<JDD::Definition::Value> ExpectString(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data) {
+    auto possibleModuleOrVar = ExpectIdentifiant(current);
+    if (possibleModuleOrVar.has_value() && data.isVariable(possibleModuleOrVar->content) && data.getVariable(possibleModuleOrVar->content)->type == JDD::Definition::STRING)
+        return data.getVariable(possibleModuleOrVar->content)->value;
+    else if (possibleModuleOrVar.has_value() && possibleModuleOrVar->content == "String") {
+        JDD::Definition::Value v;
+        v.content = "";
+        v.type = JDD::Definition::Types::STRING;
+        while (ExpectOperator(current, ".").has_value() && data.isStringModuleImported) {
+            JDD::Modules::ModulesManager::useStringModule(current, data, v.content);
+        }
+        return v;
+    }
+
+    auto possibleClassicValue = ExpectValue(current, data);
+    if (!possibleClassicValue.has_value() || possibleClassicValue->type != JDD::Definition::STRING)
+        return std::nullopt;
+
+    std::string nextStr = possibleClassicValue->content;
+    while (ExpectOperator(current, ".").has_value() && possibleClassicValue->type == JDD::Definition::STRING && data.isStringModuleImported) {
+        JDD::Modules::ModulesManager::useStringModule(current, data, nextStr);
+    }
+
+    JDD::Definition::Value v;
+    v.type = JDD::Definition::STRING;
+    v.content = nextStr;
+    return v;
 }

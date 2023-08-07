@@ -12,3 +12,4 @@ std::optional<JDD::Lexer::Token> ExpectIdentifiant(std::vector<JDD::Lexer::Token
 std::optional<JDD::Lexer::Token> ExpectOperator(std::vector<JDD::Lexer::Token>::const_iterator& current, std::string_view o = "");
 std::optional<JDD::Definition::Types> ExpectType(std::vector<JDD::Lexer::Token>::const_iterator& current);
 std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data);
+std::optional<JDD::Definition::Value> ExpectString(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data);
