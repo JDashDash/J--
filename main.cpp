@@ -13,6 +13,7 @@ bool endsWith(std::string_view str, std::string_view suffix) {
     }
     return false;
 }
+
 std::string toLower(std::string str) {
     std::string result = std::move(str);
     std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) { return std::tolower(c); });
@@ -44,7 +45,7 @@ int main(int argc, char** argv) {
 
     auto tokenList = JDD::Lexer::Builder::ParserTokens(code);
 
-    //for (auto const& e : tokenList) std::cout << e << std::endl;
+    //for (auto const& e : tokenList_importFile) std::cout << e << std::endl;
 
     JDD::Parser::JDDParser::main(tokenList);
 
