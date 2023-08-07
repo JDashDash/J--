@@ -231,6 +231,8 @@ namespace JDD::Parser {
             data.isStringModuleImported = true;
         else if (possibleModule.has_value() && possibleModule->content == "Boolean")
             data.isBooleanModuleImported = true;
+        else if (possibleModule.has_value() && possibleModule->content == "Double")
+            data.isDoubleModuleImported = true;
 
 
         if (!ExpectOperator(current, ";").has_value())
