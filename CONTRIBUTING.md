@@ -1,32 +1,32 @@
-# J-- : Contribuer au projet
+# J--: Contribute to the project
 
-Dans ce document, vous trouverez des informations pour contribuer au projet.
+In this document you will find information to contribute to the project.
 
-## Signaler un problème, un bug
+## Report a problem, a bug
 
-Les erreurs de Windows peuvent arriver, je vous conseille de faire une recherche sur Internet **avant** d'envoyer un message dans les 
-[issues](https://github.com/JDashDash/J--/issues)_ du projet.
-La communauté de Microsoft peut déjà en avoir parlé sur un forum.
+Windows errors can happen, I advise you to search the Internet **before** sending a message in the
+[issues](https://github.com/JDashDash/J--/issues)_ of the project.
+The Microsoft community may have already talked about it on a forum.
 
-Les bugs sont malheureusement courants dans chaque projet informatique, la meilleure façon d'informer les développeurs/le développeur est de les signalers.
+Bugs are unfortunately common in every IT project, the best way to inform developers/developer is to report them.
 
-Si vous êtes face à un problème ou à un bug en exécutant le programme, je vous invite à nous en faire part dans les _[issues](https://github.com/JDashDash/J--/issues)_ du projet.
+If you are faced with a problem or a bug while running the program, I invite you to let us know in the _[issues](https://github.com/JDashDash/J--/issues)_ of the project .
 
-Si vous avez un compte discord, je vous conseille devenir directement dessus, cela sera plus simple pour la communication.
+If you have a discord account, I advise you to go directly to it, it will be easier for communication.
 
 
 ## Suggestions
 
-Je suis ouvert à toute proposition, mon but est de créer un langage logique et qui plait aux utilisateurs.
+I am open to any proposal, my goal is to create a logical language that pleases users.
 
-N'hésitez pas à me faire part de vos suggestions et idées pour apporter des nouveautés ou amélioré le projet.
+Do not hesitate to send me your suggestions and ideas to bring new features or improve the project.
 
-Vous pouvez m'en faire part dans _[pull requests](https://github.com/JDashDash/J--/pulls)_ ou sur le serveur discord dans le channel respectif.
+You can let me know in _[pull requests](https://github.com/JDashDash/J--/pulls)_ or on the discord server in the respective channel.
 
 
-## Project Helpers & Membres classiques
+## Project Helpers & Classic Members
 
-Les **Project Helpers** sont des bénévoles qui participent à des débats organisés par moi-même autour du langage, on discute des syntaxes et des mises à jour qui vont être ajouté.
-Les candidatures se trouvent sur le serveur discord.
+The **Project Helpers** are volunteers who participate in debates organized by myself around the language, we discuss syntaxes and updates that will be added.
+Applications can be found on the discord server.
 
-Les membres classiques peuvent proposer des idées sur le serveur discord également, comme sur le github dans _[pull requests](https://github.com/JDashDash/J--/pulls)_ :) !
+Regular members can submit ideas on the discord server as well, like on github in _[pull requests](https://github.com/JDashDash/J--/pulls)_ :)!
