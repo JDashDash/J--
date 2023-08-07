@@ -78,7 +78,7 @@ println("ccaa bb".replace("b", "a"));
 
 [Modules](https://github.com/JDashDash/Modules)
 
-[Discord Server]()
+[Discord Server](https://discord.gg/PsC9gjm65U)
 
 [Website]()
 
