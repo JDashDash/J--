@@ -21,3 +21,12 @@ std::ostream &JDD::Definition::operator<<(std::ostream &flux, const JDD::Definit
     flux << "(Variable: " << var.name << ", " << var.value.content << ", " << var.isFinal << ")";
     return flux;
 }
+
+bool JDD::Definition::Variable::contains_fileAllowAccess(const std::string &elem) {
+    bool result = false;
+    if(std::find(this->fileAllowAccess.begin(), this->fileAllowAccess.end(), elem) != this->fileAllowAccess.end())
+    {
+        result = true;
+    }
+    return result;
+}

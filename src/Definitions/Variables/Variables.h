@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+#include<algorithm>
 
 #include "../Types/Types.h"
 #include "../Value/Value.h"
@@ -29,6 +31,9 @@ namespace JDD::Definition {
         Types type;
         bool isFinal = false;
         VariableState state = VarPrivate;
+        std::vector<std::string> fileAllowAccess;
+
+        bool contains_fileAllowAccess(const std::string & elem);
 
         friend std::ostream& operator<<(std::ostream& flux, Variable const& var);
     };
