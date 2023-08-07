@@ -1,10 +1,13 @@
+import String;
 import Boolean;
 
-println(Boolean.toInt(true));
-println(Boolean.fromInt(1));
-println(true.opposite());
-println(false.opposite());
-println(Boolean.compare(10 > 5));
-println(Boolean.compare(2 > 5));
-boolean a = Boolean.fromInt(0);
-println("result:" a.opposite()); // println("result:" a.opposite()); == println("result:" + a.opposite());
+string msg = "hi";
+println(msg.getIndexFromChar("h"));
+int a = msg.getIndexFromChar("h");
+println(a);
+
+boolean f = Boolean.fromInt(0);
+boolean v = Boolean.fromInt(1);
+println(f ", " v);
+
+int x = Boolean.fromInt(0); // Error
