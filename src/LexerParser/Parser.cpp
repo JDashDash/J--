@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <fstream>
+#include <vector>
 
 namespace JDD::Parser {
     bool endsWith(std::string_view str, std::string_view suffix) {
@@ -29,7 +30,7 @@ namespace JDD::Parser {
         }
     }
 
-    Definition::Data JDDParser::executeBlocCode(const std::vector<JDD::Lexer::Token>& tokenList, Definition::Data& old_data) {
+    Definition::Data JDDParser::executeBlocCode(const std::vector<JDD::Lexer::Token>& tokenList, Definition::Data& old_data, bool classicExecution) {
         Definition::Data data;
         for (auto const& var : old_data.Variables) {
             data.pushVariable(var.second);
@@ -37,7 +38,7 @@ namespace JDD::Parser {
         auto current_token = tokenList.begin();
 
         while (current_token != tokenList.end()) {
-            if (!ManagerInstruction(current_token, data, tokenList, false)) {
+            if (!ManagerInstruction(current_token, data, tokenList, classicExecution)) {
                 std::cerr << "Unknown: " << current_token->content << std::endl;
                 ++current_token;
             }
@@ -83,7 +84,10 @@ namespace JDD::Parser {
             }
                 // Special : (a = 10, call a function)
             else if (data.isVariable(instruction->content)) {
-                callOrVariableManagement(current, data, instruction->content);
+                variableManagement(current, data, instruction->content);
+                return true;
+            } else if (data.isFunction(instruction->content)) {
+                functionManagement(current, data, instruction->content);
                 return true;
             }
         } else {
@@ -165,7 +169,7 @@ namespace JDD::Parser {
         data.pushVariable(variable);
     }
 
-    void JDDParser::callOrVariableManagement(std::vector<Lexer::Token>::const_iterator& current, Definition::Data &data, const std::string& var_name) {
+    void JDDParser::variableManagement(std::vector<Lexer::Token>::const_iterator& current, Definition::Data &data, const std::string& var_name) {
         if (!ExpectOperator(current, "=").has_value())
             std::cerr << "Forgot to introduce value with '='" << std::endl;
 
@@ -230,6 +234,26 @@ namespace JDD::Parser {
                     std::cerr << "Awaiting a new argument" << std::endl;
             }
 
+            std::vector<std::string> func_filesName;
+
+            if (state == Definition::FuncProtected) {
+                if (!ExpectOperator(current, "[").has_value())
+                    std::cerr << "You have to give one/multiple file as string to say which have access to your function" << std::endl;
+
+                while (!ExpectOperator(current, "]").has_value()) {
+                    auto fileName = ExpectValue(current, data);
+                    if (!fileName.has_value() || fileName->type != Definition::STRING)
+                        std::cerr << "You have to give the path file that will can get access to your function" << std::endl;
+
+                    func_filesName.push_back(fileName->content);
+
+                    if (ExpectOperator(current, "]").has_value()) {
+                        break;
+                    } else if (!ExpectOperator(current, ",").has_value())
+                        std::cerr << "Await ',' to give the path file you want to allow access to your function" << std::endl;
+                }
+            }
+
             if (!ExpectOperator(current, "{").has_value())
                 std::cerr << "Forgot to open the bloc to include your code" << std::endl;
 
@@ -245,7 +269,10 @@ namespace JDD::Parser {
                 current++;
             }
 
+            function.fileAllowAccess = func_filesName;
             function.tokens = innerCodeTokens;
+
+            data.pushFunction(function);
         } else if (ExpectOperator(current, "[").has_value() && state == Definition::FuncProtected) { // Protected Variable
             while (!ExpectOperator(current, "]").has_value()) {
                 auto fileName = ExpectValue(current, data);
@@ -302,6 +329,16 @@ namespace JDD::Parser {
         }
     }
 
+    void JDDParser::functionManagement(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data, const std::string& func_name) {
+        auto func = data.getFunction(func_name);
+        if (func->arguments.size() == 0) {
+            auto next_data = executeBlocCode(func->tokens, data, true);
+
+            if (!ExpectOperator(current, ";").has_value())
+                std::cerr << "Forgot to close the instruction with ';'" << std::endl;
+        }
+    }
+
     void JDDParser::import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data) {
         auto possibleModule = ExpectIdentifiant(current);
         if (possibleModule.has_value()) {
@@ -337,12 +374,20 @@ namespace JDD::Parser {
         std::string code((std::istreambuf_iterator<char>(importFile)), (std::istreambuf_iterator<char>()));
         auto tokenList_importFile = JDD::Lexer::Builder::ParserTokens(code);
 
-        auto next_data = executeBlocCode(tokenList_importFile, data);
+        auto next_data = executeBlocCode(tokenList_importFile, data, false);
         for (auto var : next_data.Variables) {
             if (var.second.state == Definition::VarPublic) {
                 data.pushVariable(var.second);
             } else if (var.second.state == Definition::VarProtected && var.second.contains_fileAllowAccess(asFileName->content)) {
                 data.pushVariable(var.second);
+            }
+        }
+
+        for (auto var : next_data.Functions) {
+            if (var.second.state == Definition::FuncPublic) {
+                data.pushFunction(var.second);
+            } else if (var.second.state == Definition::FuncProtected && var.second.contains_fileAllowAccess(asFileName->content)) {
+                data.pushFunction(var.second);
             }
         }
 

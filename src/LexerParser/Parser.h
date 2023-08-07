@@ -23,20 +23,18 @@ namespace JDD::Parser {
 
     private:
         // Essentials:
-        static Definition::Data executeBlocCode(const std::vector<JDD::Lexer::Token>& tokenList, Definition::Data& old_data);
+        static Definition::Data executeBlocCode(const std::vector<JDD::Lexer::Token>& tokenList, Definition::Data& old_data, bool classicExecution);
         static bool ManagerInstruction(std::vector<Lexer::Token>::const_iterator& current, Definition::Data& data, std::vector<Lexer::Token> tokenList, bool classicExecution);
 
         // Instructions :
         static void print(std::vector<Lexer::Token>::const_iterator &current, bool jumpLine, Definition::Data& data);
-        static void variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type,
-                              Definition::Data &data);
+        static void variables(std::vector<Lexer::Token>::const_iterator &current, JDD::Definition::Types type, Definition::Data &data);
         static void import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data);
 
         // Special :
-        static void callOrVariableManagement(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data, const std::string& var_name);
-
-        static void
-        specialVariable_defineFunction(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data,
-                                       std::vector<Lexer::Token> tokenList, Definition::FunctionState state);
+        static void variableManagement(std::vector<Lexer::Token>::const_iterator &current, Definition::Data& data, const std::string& var_name);
+        static void specialVariable_defineFunction(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data,
+                                                   std::vector<Lexer::Token> tokenList, Definition::FunctionState state);
+        static void functionManagement(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data, const std::string& func_name);
     };
 }
