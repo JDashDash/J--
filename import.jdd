@@ -1,1 +1,3 @@
-protected int a ["main.jdd"] = 10;
+public void mainFunc() {
+    println("hello everyone!");
+}
