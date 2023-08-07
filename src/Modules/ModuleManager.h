@@ -12,4 +12,5 @@
 
 namespace JDD::Modules::ModulesManager {
     void useStringModule(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data, std::string& content);
+    void useBooleanModule(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data, std::string& content);
 }
