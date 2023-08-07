@@ -1,6 +1,7 @@
 #include "ModuleManager.h"
 #include "Boolean/Boolean.h"
 #include "Double/Double.h"
+#include "Integer/Integer.h"
 
 void JDD::Modules::ModulesManager::useStringModule(std::vector<JDD::Lexer::Token>::const_iterator& current, JDD::Definition::Data& data, Definition::Value& value) {
     auto functionString = ExpectIdentifiant(current);
@@ -140,7 +141,7 @@ void JDD::Modules::ModulesManager::useBooleanModule(std::vector<JDD::Lexer::Toke
         else value.content = "false";
         
     } else
-        std::cerr << "This function from String is not available (" << functionString->content << " does not exist)" << std::endl;
+        std::cerr << "This function from Boolean is not available (" << functionString->content << " does not exist)" << std::endl;
 
 
     if (!ExpectOperator(current, ")").has_value())
@@ -240,8 +241,128 @@ void JDD::Modules::ModulesManager::useDoubleModule(std::vector<JDD::Lexer::Token
         } else {
             value.content = std::to_string(JDD::Modules::Double::div(std::stod(value.content), std::stod(firstValue->content)));
         }
+    } else if (functionString.has_value() && functionString->content == "abs") {
+        auto firstValue = ExpectValue(current, data);
+        if (!firstValue.has_value() || firstValue->type != Definition::DOUBLE)
+            std::cerr << "'div' function need a double value as first parameter" << std::endl;
+
+        value.content = std::to_string(JDD::Modules::Double::abs(std::stod(value.content)));
     } else
-        std::cerr << "This function from String is not available (" << functionString->content << " does not exist)" << std::endl;
+        std::cerr << "This function from Double is not available (" << functionString->content << " does not exist)" << std::endl;
+
+
+    if (!ExpectOperator(current, ")").has_value())
+        std::cerr << "Close with ')' to conclude the operation(s)" << std::endl;
+}
+
+
+
+void JDD::Modules::ModulesManager::useIntegerModule(std::vector<JDD::Lexer::Token>::const_iterator &current,
+                                                    JDD::Definition::Data &data, Definition::Value &value) {
+    auto functionString = ExpectIdentifiant(current);
+    if (!functionString.has_value())
+        std::cerr << "Specify a function from String module" << std::endl;
+
+    if (!ExpectOperator(current, "(").has_value())
+        std::cerr << "Open '()' to give arguments to the function" << std::endl;
+
+    if (functionString.has_value() && functionString->content == "min") {
+        auto firstValue = ExpectValue(current, data);
+        if (!firstValue.has_value() || firstValue->type != Definition::INT)
+            std::cerr << "'min' function need a double value as first parameter" << std::endl;
+
+        if (!ExpectOperator(current, ",").has_value())
+            std::cerr << "Need ',' to separate parameters in 'min'" << std::endl;
+
+        auto secondValue = ExpectValue(current, data);
+        if (!secondValue.has_value() || secondValue->type != Definition::INT)
+            std::cerr << "'min' function need a int value as second parameter" << std::endl;
+
+        value.content = std::to_string(JDD::Modules::Integer::min(std::stoi(firstValue->content), std::stoi(secondValue->content)));
+    } else if (functionString.has_value() && functionString->content == "max") {
+            auto firstValue = ExpectValue(current, data);
+            if (!firstValue.has_value() || firstValue->type != Definition::INT)
+                std::cerr << "'max' function need a int value as first parameter" << std::endl;
+
+            if (!ExpectOperator(current, ",").has_value())
+                std::cerr << "Need ',' to separate parameters in 'max'" << std::endl;
+
+            auto secondValue = ExpectValue(current, data);
+            if (!secondValue.has_value() || secondValue->type != Definition::INT)
+                std::cerr << "'max' function need a int value as second parameter" << std::endl;
+
+            value.content = std::to_string(JDD::Modules::Integer::max(std::stoi(firstValue->content), std::stoi(secondValue->content)));
+        } else if (functionString.has_value() && functionString->content == "sum") {
+            auto firstValue = ExpectValue(current, data);
+            if (!firstValue.has_value() || firstValue->type != Definition::INT)
+                std::cerr << "'sum' function need a int value as first parameter" << std::endl;
+
+            if (ExpectOperator(current, ",").has_value()) {
+                auto secondValue = ExpectValue(current, data);
+                if (!secondValue.has_value() || secondValue->type != Definition::INT)
+                    std::cerr << "'sum' function need a int value as second parameter" << std::endl;
+
+                value.content = std::to_string(JDD::Modules::Integer::sum(std::stoi(firstValue->content), std::stoi(secondValue->content)));
+            } else {
+                value.content = std::to_string(JDD::Modules::Integer::sum(std::stoi(value.content), std::stoi(firstValue->content)));
+            }
+        } else if (functionString.has_value() && functionString->content == "sub") {
+            auto firstValue = ExpectValue(current, data);
+            if (!firstValue.has_value() || firstValue->type != Definition::INT)
+                std::cerr << "'sub' function need a int value as first parameter" << std::endl;
+
+            if (ExpectOperator(current, ",").has_value()) {
+                auto secondValue = ExpectValue(current, data);
+                if (!secondValue.has_value() || secondValue->type != Definition::INT)
+                    std::cerr << "'sub' function need a int value as second parameter" << std::endl;
+
+                value.content = std::to_string(JDD::Modules::Integer::sub(std::stoi(firstValue->content), std::stoi(secondValue->content)));
+            } else {
+                value.content = std::to_string(JDD::Modules::Integer::sub(std::stoi(value.content), std::stoi(firstValue->content)));
+            }
+        } else if (functionString.has_value() && functionString->content == "mul") {
+            auto firstValue = ExpectValue(current, data);
+            if (!firstValue.has_value() || firstValue->type != Definition::INT)
+                std::cerr << "'mul' function need a int value as first parameter" << std::endl;
+
+            if (ExpectOperator(current, ",").has_value()) {
+                auto secondValue = ExpectValue(current, data);
+                if (!secondValue.has_value() || secondValue->type != Definition::INT)
+                    std::cerr << "'mul' function need a int value as second parameter" << std::endl;
+
+                value.content = std::to_string(JDD::Modules::Integer::mul(std::stoi(firstValue->content), std::stoi(secondValue->content)));
+            } else {
+                value.content = std::to_string(JDD::Modules::Integer::mul(std::stoi(value.content), std::stoi(firstValue->content)));
+            }
+        } else if (functionString.has_value() && functionString->content == "div") {
+            auto firstValue = ExpectValue(current, data);
+            if (!firstValue.has_value() || firstValue->type != Definition::INT)
+                std::cerr << "'div' function need a int value as first parameter" << std::endl;
+
+            if (ExpectOperator(current, ",").has_value()) {
+                auto secondValue = ExpectValue(current, data);
+                if (!secondValue.has_value() || secondValue->type != Definition::INT)
+                    std::cerr << "'div' function need a int value as second parameter" << std::endl;
+
+                value.content = std::to_string(JDD::Modules::Integer::div(std::stoi(firstValue->content), std::stoi(secondValue->content)));
+            } else {
+                value.content = std::to_string(JDD::Modules::Integer::div(std::stoi(value.content), std::stoi(firstValue->content)));
+            }
+        } else if (functionString.has_value() && functionString->content == "fromBoolean") {
+            auto firstValue = ExpectValue(current, data);
+            if (!firstValue.has_value() || firstValue->type != Definition::BOOLEAN)
+                std::cerr << "'fromBoolean' function need a int value as first parameter" << std::endl;
+
+            if (firstValue->content == "true") value.content = std::to_string(JDD::Modules::Integer::fromBoolean(true));
+            else value.content = std::to_string(JDD::Modules::Integer::fromBoolean(false));
+        } else if (functionString.has_value() && functionString->content == "abs") {
+            auto firstValue = ExpectValue(current, data);
+            if (!firstValue.has_value() || firstValue->type != Definition::INT)
+                std::cerr << "'abs' function need a int value as first parameter" << std::endl;
+
+            value.content = std::to_string(JDD::Modules::Integer::abs(std::stoi(firstValue->content)));
+        } else
+            std::cerr << "This function from Integer is not available (" << functionString->content << " does not exist)" << std::endl;
 
 
     if (!ExpectOperator(current, ")").has_value())
