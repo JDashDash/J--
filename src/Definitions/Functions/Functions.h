@@ -1,5 +1,8 @@
+#pragma once
+
 #include <iostream>
 #include <map>
+#include <algorithm>
 #include "../Types/Types.h"
 #include "../Value/Value.h"
 #include "../../LexerParser/Lexer.h"
@@ -35,6 +38,10 @@ namespace JDD::Definition {
         std::map<std::string, Argument> arguments;
         Value returnValue;
         std::vector<Lexer::Token> tokens;
+
+        std::vector<std::string> fileAllowAccess;
+
+        bool contains_fileAllowAccess(const std::string & elem);
 
         [[nodiscard]] bool isArgument(const std::string& n) const;
         void pushArgument(const Argument& a);
