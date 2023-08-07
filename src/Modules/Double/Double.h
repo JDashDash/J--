@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <cmath>
 
 namespace JDD::Modules::Double {
     double max(double x, double y);
@@ -9,4 +10,5 @@ namespace JDD::Modules::Double {
     double sub(double x, double y); // x - y
     double mul(double x, double y); // x * y
     double div(double x, double y); // x * y
+    double abs(double x); // absolute value
 }

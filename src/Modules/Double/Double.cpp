@@ -28,4 +28,8 @@ namespace JDD::Modules::Double {
     double div(double x, double y) {
         return x / y;
     }
+
+    double abs(double x) {
+        return std::abs(x);
+    }
 }
