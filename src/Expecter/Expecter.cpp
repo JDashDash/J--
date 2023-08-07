@@ -83,6 +83,10 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
             while (ExpectOperator(current, ".").has_value() && data.isBooleanModuleImported) {
                 JDD::Modules::ModulesManager::useBooleanModule(current, data, v);
             }
+        } else if (v.type == JDD::Definition::Types::DOUBLE) {
+            while (ExpectOperator(current, ".").has_value() && data.isDoubleModuleImported) {
+                JDD::Modules::ModulesManager::useDoubleModule(current, data, v);
+            }
         }
 
         return v;
@@ -99,6 +103,10 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
                 v.type = JDD::Definition::Types::BOOLEAN;
                 while (ExpectOperator(current, ".").has_value() && data.isBooleanModuleImported)
                     JDD::Modules::ModulesManager::useBooleanModule(current, data, v);
+            } else if (var->type == JDD::Definition::Types::DOUBLE) {
+                v.type = JDD::Definition::Types::DOUBLE;
+                while (ExpectOperator(current, ".").has_value() && data.isDoubleModuleImported)
+                    JDD::Modules::ModulesManager::useDoubleModule(current, data, v);
             }
             return v;
         } else if (current->content == "String") { // String Module without any value (variable value or classic value)
@@ -117,6 +125,15 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
             current++;
             while (ExpectOperator(current, ".").has_value() && data.isBooleanModuleImported) {
                 JDD::Modules::ModulesManager::useBooleanModule(current, data, v);
+            }
+            return v;
+        } else if (current->content == "Double") { // Boolean Module without any value (variable value or classic value)
+            JDD::Definition::Value v;
+            v.content = "";
+            v.type = JDD::Definition::Types::DOUBLE;
+            current++;
+            while (ExpectOperator(current, ".").has_value() && data.isDoubleModuleImported) {
+                JDD::Modules::ModulesManager::useDoubleModule(current, data, v);
             }
             return v;
         }
