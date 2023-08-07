@@ -1,13 +1,16 @@
-import String;
-import Boolean;
+import Double;
 
-string msg = "hi";
-println(msg.getIndexFromChar("h"));
-int a = msg.getIndexFromChar("h");
+double a = Double.min(10.0, 5.0);
+double b = Double.max(10.0, 5.0);
 println(a);
-
-boolean f = Boolean.fromInt(0);
-boolean v = Boolean.fromInt(1);
-println(f ", " v);
-
-int x = Boolean.fromInt(0); // Error
+println(b);
+double c = Double.max(a, b);
+println(a ", " b ", " c);
+c = Double.sum(c, 15.0);
+println(c);
+c = Double.sub(c, 10.0);
+println(c);
+c = Double.mul(c, 10.0);
+println(c);
+c = Double.div(c, 5.0);
+println(c);
