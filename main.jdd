@@ -1,3 +1,0 @@
-import "import.jdd" as "main.jdd";
-
-mainFunc;
