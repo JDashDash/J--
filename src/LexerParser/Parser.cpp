@@ -350,44 +350,46 @@ namespace JDD::Parser {
                 data.isDoubleModuleImported = true;
             else if (possibleModule.has_value() && possibleModule->content == "Integer")
                 data.isIntegerModuleImported = true;
-        }
+            else
+                std::cerr << possibleModule->content << " does not exist in modules added to J--" << std::endl;
+        } else {
+            auto possibleFile = ExpectValue(current, data);
+            if (!possibleFile.has_value() || possibleFile->type != Definition::STRING || !endsWith(toLower(possibleFile->content), toLower(".jdd")))
+                std::cerr << "Specify the module (String, Boolean, Double, Integer, or else) or a file with the extension '.jdd'" << std::endl;
 
-        auto possibleFile = ExpectValue(current, data);
-        if (!possibleFile.has_value() || possibleFile->type != Definition::STRING || !endsWith(toLower(possibleFile->content), toLower(".jdd")))
-            std::cerr << "Specify the module (String, Boolean, Double, Integer, or else) or a file with the extension '.jdd'" << std::endl;
-
-        std::ifstream importFile {possibleFile->content};
-        if (!importFile) {
-            std::cerr << "Unable to open the specified file in import." << std::endl;
-        }
-
-        auto asFile = ExpectIdentifiant(current);
-        if (!asFile.has_value() || asFile->content != "as") {
-            std::cerr << "Specify how you want to import the file " << possibleFile->content << ", what the name you want to give to your current file" << std::endl;
-        }
-
-        auto asFileName = ExpectValue(current, data);
-        if (!asFileName.has_value() || asFileName->type != Definition::STRING || !endsWith(toLower(asFileName->content), toLower(".jdd")))
-            std::cerr << "Specify the module (String, Boolean, Double, Integer, or else) or a file with the extension '.jdd'" << std::endl;
-
-
-        std::string code((std::istreambuf_iterator<char>(importFile)), (std::istreambuf_iterator<char>()));
-        auto tokenList_importFile = JDD::Lexer::Builder::ParserTokens(code);
-
-        auto next_data = executeBlocCode(tokenList_importFile, data, false);
-        for (auto var : next_data.Variables) {
-            if (var.second.state == Definition::VarPublic) {
-                data.pushVariable(var.second);
-            } else if (var.second.state == Definition::VarProtected && var.second.contains_fileAllowAccess(asFileName->content)) {
-                data.pushVariable(var.second);
+            std::ifstream importFile {possibleFile->content};
+            if (!importFile) {
+                std::cerr << "Unable to open the specified file in import." << std::endl;
             }
-        }
 
-        for (auto var : next_data.Functions) {
-            if (var.second.state == Definition::FuncPublic) {
-                data.pushFunction(var.second);
-            } else if (var.second.state == Definition::FuncProtected && var.second.contains_fileAllowAccess(asFileName->content)) {
-                data.pushFunction(var.second);
+            auto asFile = ExpectIdentifiant(current);
+            if (!asFile.has_value() || asFile->content != "as") {
+                std::cerr << "Specify how you want to import the file " << possibleFile->content << ", what the name you want to give to your current file" << std::endl;
+            }
+
+            auto asFileName = ExpectValue(current, data);
+            if (!asFileName.has_value() || asFileName->type != Definition::STRING || !endsWith(toLower(asFileName->content), toLower(".jdd")))
+                std::cerr << "Specify the module (String, Boolean, Double, Integer, or else) or a file with the extension '.jdd'" << std::endl;
+
+
+            std::string code((std::istreambuf_iterator<char>(importFile)), (std::istreambuf_iterator<char>()));
+            auto tokenList_importFile = JDD::Lexer::Builder::ParserTokens(code);
+
+            auto next_data = executeBlocCode(tokenList_importFile, data, false);
+            for (auto var : next_data.Variables) {
+                if (var.second.state == Definition::VarPublic) {
+                    data.pushVariable(var.second);
+                } else if (var.second.state == Definition::VarProtected && var.second.contains_fileAllowAccess(asFileName->content)) {
+                    data.pushVariable(var.second);
+                }
+            }
+
+            for (auto var : next_data.Functions) {
+                if (var.second.state == Definition::FuncPublic) {
+                    data.pushFunction(var.second);
+                } else if (var.second.state == Definition::FuncProtected && var.second.contains_fileAllowAccess(asFileName->content)) {
+                    data.pushFunction(var.second);
+                }
             }
         }
 
