@@ -100,18 +100,22 @@ std::optional<JDD::Definition::Value> ExpectValue(std::vector<JDD::Lexer::Token>
             JDD::Definition::Value v = var->value;
             current++;
             if (var->type == JDD::Definition::STRING) {
+                v.variableName = var->name;
                 v.type = JDD::Definition::Types::STRING;
                 while (ExpectOperator(current, ".").has_value() && data.isStringModuleImported)
                     JDD::Modules::ModulesManager::useStringModule(current, data, v);
             } else if (var->type == JDD::Definition::Types::BOOLEAN) {
+                v.variableName = var->name;
                 v.type = JDD::Definition::Types::BOOLEAN;
                 while (ExpectOperator(current, ".").has_value() && data.isBooleanModuleImported)
                     JDD::Modules::ModulesManager::useBooleanModule(current, data, v);
             } else if (var->type == JDD::Definition::Types::DOUBLE) {
+                v.variableName = var->name;
                 v.type = JDD::Definition::Types::DOUBLE;
                 while (ExpectOperator(current, ".").has_value() && data.isDoubleModuleImported)
                     JDD::Modules::ModulesManager::useDoubleModule(current, data, v);
             } else if (var->type == JDD::Definition::Types::INT) {
+                v.variableName = var->name;
                 v.type = JDD::Definition::Types::INT;
                 while (ExpectOperator(current, ".").has_value() && data.isIntegerModuleImported)
                     JDD::Modules::ModulesManager::useIntegerModule(current, data, v);
