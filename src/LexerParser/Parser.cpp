@@ -183,6 +183,7 @@ namespace JDD::Parser {
                     std::cerr << "The variable already exist" << std::endl;
 
                 data.pushVariable(variable);
+                data.pushVariable(referenceVar.value());
             } else
                 std::cerr << "The action is not available" << std::endl;
         } else {
@@ -210,13 +211,15 @@ namespace JDD::Parser {
                 std::cerr << "forgot to close the instruction with ';'" << std::endl;
 
             auto var = data.getVariable(var_name);
-            if (!var->isFinal)
+            if (!var->isFinal) {
                 data.updateValueOfVariable(var->name, value->content);
+            } else {
+                std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
+            }
+
             if (!var->possibleReference_name.empty()) {
                 data.updateValueOfVariable(var->possibleReference_name, value->content);
             }
-            else
-                std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
         } else if (ExpectOperator(current, "+").has_value()) {
             if (!ExpectOperator(current, "=").has_value())
                 std::cerr << "You need to add '=' to update your variable" << std::endl;
