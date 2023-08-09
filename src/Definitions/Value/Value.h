@@ -9,6 +9,7 @@ namespace JDD::Definition {
     public:
         std::string content;
         JDD::Definition::Types type;
+        std::string variableName = "";
 
         friend std::ostream& operator<<(std::ostream& flux, Value const& v);
     };
