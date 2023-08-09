@@ -162,17 +162,42 @@ namespace JDD::Parser {
         if (!var_value.has_value())
             std::cerr << "Forgot to give value to your variable" << std::endl;
 
-        if (!ExpectOperator(current, ";").has_value())
-            std::cerr << "Forgot to close the instruction with ';'" << std::endl;
+        if (ExpectOperator(current, ":").has_value() && data.isVariable(var_value->variableName)) {
+            auto action = ExpectIdentifiant(current);
+            if (!action.has_value())
+                std::cerr << "You have to indicate what action you want to do on your variable" << std::endl;
 
-        if (var_type != var_value->type)
-            std::cerr << "The variable type is not valid for the value type" << std::endl;
+            if (action->content == "reference") {
+                Definition::Variable variable(var_name->content, var_value.value(), var_type.value(), type == JDD::Definition::Types::FINAL_NotType);
+                variable.possibleReference_name = var_value->variableName;
+                auto referenceVar = data.getVariable(var_value->variableName);
+                referenceVar->possibleReference_name = variable.name;
 
-        if (data.isVariable(var_name->content))
-            std::cerr << "The variable already exist" << std::endl;
+                if (!ExpectOperator(current, ";").has_value())
+                    std::cerr << "Forgot to close the instruction with ';'" << std::endl;
 
-        Definition::Variable variable(var_name->content, var_value.value(), var_type.value(), type == JDD::Definition::Types::FINAL_NotType);
-        data.pushVariable(variable);
+                if (var_type != var_value->type)
+                    std::cerr << "The variable type is not valid for the value type" << std::endl;
+
+                if (data.isVariable(var_name->content))
+                    std::cerr << "The variable already exist" << std::endl;
+
+                data.pushVariable(variable);
+            } else
+                std::cerr << "The action is not available" << std::endl;
+        } else {
+            if (!ExpectOperator(current, ";").has_value())
+                std::cerr << "Forgot to close the instruction with ';'" << std::endl;
+
+            if (var_type != var_value->type)
+                std::cerr << "The variable type is not valid for the value type" << std::endl;
+
+            if (data.isVariable(var_name->content))
+                std::cerr << "The variable already exist" << std::endl;
+
+            Definition::Variable variable(var_name->content, var_value.value(), var_type.value(), type == JDD::Definition::Types::FINAL_NotType);
+            data.pushVariable(variable);
+        }
     }
 
     void JDDParser::variableManagement(std::vector<Lexer::Token>::const_iterator& current, Definition::Data &data, const std::string& var_name) {
@@ -187,6 +212,9 @@ namespace JDD::Parser {
             auto var = data.getVariable(var_name);
             if (!var->isFinal)
                 data.updateValueOfVariable(var->name, value->content);
+            if (!var->possibleReference_name.empty()) {
+                data.updateValueOfVariable(var->possibleReference_name, value->content);
+            }
             else
                 std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
         } else if (ExpectOperator(current, "+").has_value()) {
@@ -206,14 +234,23 @@ namespace JDD::Parser {
                     int final_value = std::stoi(var->value.content);
                     final_value += std::stoi(value->content);
                     data.updateValueOfVariable(var->name, std::to_string(final_value));
+                    if (!var->possibleReference_name.empty()) {
+                        data.updateValueOfVariable(var->possibleReference_name, std::to_string(final_value));
+                    }
                 } else if (var->type == Definition::DOUBLE && value->type == Definition::DOUBLE) {
                     double final_value = std::stod(var->value.content);
                     final_value += std::stod(value->content);
                     data.updateValueOfVariable(var->name, std::to_string(final_value));
+                    if (!var->possibleReference_name.empty()) {
+                        data.updateValueOfVariable(var->possibleReference_name, std::to_string(final_value));
+                    }
                 } else if (var->type == Definition::STRING && value->type == Definition::STRING) {
                     std::string final_value = var->value.content;
                     final_value += value->content;
                     data.updateValueOfVariable(var->name, final_value);
+                    if (!var->possibleReference_name.empty()) {
+                        data.updateValueOfVariable(var->possibleReference_name, final_value);
+                    }
                 } else {
                     std::cerr << "The value type and variable type is the same" << std::endl;
                 }
@@ -236,10 +273,16 @@ namespace JDD::Parser {
                     int final_value = std::stoi(var->value.content);
                     final_value -= std::stoi(value->content);
                     data.updateValueOfVariable(var->name, std::to_string(final_value));
+                    if (!var->possibleReference_name.empty()) {
+                        data.updateValueOfVariable(var->possibleReference_name, std::to_string(final_value));
+                    }
                 } else if (var->type == Definition::DOUBLE && value->type == Definition::DOUBLE) {
                     double final_value = std::stod(var->value.content);
                     final_value -= std::stod(value->content);
                     data.updateValueOfVariable(var->name, std::to_string(final_value));
+                    if (!var->possibleReference_name.empty()) {
+                        data.updateValueOfVariable(var->possibleReference_name, std::to_string(final_value));
+                    }
                 } else if (var->type == Definition::STRING && value->type == Definition::STRING) {
                     std::string final_value = var->value.content;
                     size_t foundPos = final_value.find(value->content);
@@ -247,6 +290,9 @@ namespace JDD::Parser {
                         final_value.erase(foundPos, value->content.length());
                     }
                     data.updateValueOfVariable(var->name, final_value);
+                    if (!var->possibleReference_name.empty()) {
+                        data.updateValueOfVariable(var->possibleReference_name, final_value);
+                    }
                 } else {
                     std::cerr << "The value type and variable type is the same" << std::endl;
                 }
