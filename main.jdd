@@ -1,6 +1,10 @@
 int a = 10;
 int b = a:reference;
 
-println(a "," b);
-b = 15;
-println(a "," b);
+private void func() {
+    a = 15;
+}
+
+func;
+
+println(a ", " b);
