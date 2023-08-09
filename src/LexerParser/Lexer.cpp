@@ -152,6 +152,7 @@ namespace  JDD::Lexer {
                 case ',':
                 case '<':
                 case '>':
+                case ':':
                     if (current.type != POSSIBLE_STRING && current.type != COMMENT) {
                         OverToken(current, tokenList);
                         current.type = OPERATOR;
