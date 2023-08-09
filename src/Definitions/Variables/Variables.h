@@ -32,6 +32,7 @@ namespace JDD::Definition {
         bool isFinal = false;
         VariableState state = VarPrivate;
         std::vector<std::string> fileAllowAccess;
+        std::string possibleReference_name = "";
 
         bool contains_fileAllowAccess(const std::string & elem);
 
