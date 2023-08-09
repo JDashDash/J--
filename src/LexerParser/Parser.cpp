@@ -146,6 +146,12 @@ namespace JDD::Parser {
         if (!var_name.has_value())
             std::cerr << "Forgot to give a name to your variable" << std::endl;
 
+        if (!data.isFunction(var_name->content))
+            std::cerr << "A function has already this name" << std::endl;
+
+        if (!data.isVariable(var_name->content))
+            std::cerr << "A variable has already this name" << std::endl;
+
         if (var_name->content == "String")
             std::cerr << "Dot not give the name of a module" << std::endl;
 
@@ -210,6 +216,12 @@ namespace JDD::Parser {
         if (ExpectOperator(current, "(").has_value()) { // Function
             if (type == Definition::Types::FINAL_NotType)
                 std::cerr << "A function can not be declared as final" << std::endl;
+
+            if (!data.isFunction(name->content))
+                std::cerr << "A function has already this name" << std::endl;
+
+            if (!data.isVariable(name->content))
+                std::cerr << "A variable has already this name" << std::endl;
 
             Definition::Function function;
             function.name = name->content;
@@ -301,6 +313,12 @@ namespace JDD::Parser {
         }
 
         if (continueVariable) {
+            if (!data.isFunction(name->content))
+                std::cerr << "A function has already this name" << std::endl;
+
+            if (!data.isVariable(name->content))
+                std::cerr << "A variable has already this name" << std::endl;
+
             auto var_value = ExpectValue(current, data);
             if (!var_value.has_value())
                 std::cerr << "Forgot to give value to your variable" << std::endl;
@@ -331,8 +349,14 @@ namespace JDD::Parser {
 
     void JDDParser::functionManagement(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data, const std::string& func_name) {
         auto func = data.getFunction(func_name);
-        if (func->arguments.size() == 0) {
+        if (func->arguments.empty()) {
             auto next_data = executeBlocCode(func->tokens, data, true);
+
+            for (auto const& var : next_data.Variables) {
+                if (data.isVariable(var.second.name)) {
+                    data.pushVariable(var.second);
+                }
+            }
 
             if (!ExpectOperator(current, ";").has_value())
                 std::cerr << "Forgot to close the instruction with ';'" << std::endl;
