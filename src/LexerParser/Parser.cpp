@@ -176,21 +176,84 @@ namespace JDD::Parser {
     }
 
     void JDDParser::variableManagement(std::vector<Lexer::Token>::const_iterator& current, Definition::Data &data, const std::string& var_name) {
-        if (!ExpectOperator(current, "=").has_value())
+        if (ExpectOperator(current, "=").has_value()) {
+            auto value = ExpectValue(current, data);
+            if (!value.has_value())
+                std::cerr << "Forgot to give the new value to your variable" << std::endl;
+
+            if (!ExpectOperator(current, ";").has_value())
+                std::cerr << "forgot to close the instruction with ';'" << std::endl;
+
+            auto var = data.getVariable(var_name);
+            if (!var->isFinal)
+                data.updateValueOfVariable(var->name, value->content);
+            else
+                std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
+        } else if (ExpectOperator(current, "+").has_value()) {
+            if (!ExpectOperator(current, "=").has_value())
+                std::cerr << "You need to add '=' to update your variable" << std::endl;
+
+            auto value = ExpectValue(current, data);
+            if (!value.has_value())
+                std::cerr << "Forgot to give the new value to your variable" << std::endl;
+
+            if (!ExpectOperator(current, ";").has_value())
+                std::cerr << "forgot to close the instruction with ';'" << std::endl;
+
+            auto var = data.getVariable(var_name);
+            if (!var->isFinal) {
+                if (var->type == Definition::INT && value->type == Definition::INT) {
+                    int final_value = std::stoi(var->value.content);
+                    final_value += std::stoi(value->content);
+                    data.updateValueOfVariable(var->name, std::to_string(final_value));
+                } else if (var->type == Definition::DOUBLE && value->type == Definition::DOUBLE) {
+                    double final_value = std::stod(var->value.content);
+                    final_value += std::stod(value->content);
+                    data.updateValueOfVariable(var->name, std::to_string(final_value));
+                } else if (var->type == Definition::STRING && value->type == Definition::STRING) {
+                    std::string final_value = var->value.content;
+                    final_value += value->content;
+                    data.updateValueOfVariable(var->name, final_value);
+                } else {
+                    std::cerr << "The value type and variable type is the same" << std::endl;
+                }
+            } else
+                std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
+        } else if (ExpectOperator(current, "-").has_value()) {
+            if (!ExpectOperator(current, "=").has_value())
+                std::cerr << "You need to add '=' to update your variable" << std::endl;
+
+            auto value = ExpectValue(current, data);
+            if (!value.has_value())
+                std::cerr << "Forgot to give the new value to your variable" << std::endl;
+
+            if (!ExpectOperator(current, ";").has_value())
+                std::cerr << "forgot to close the instruction with ';'" << std::endl;
+
+            auto var = data.getVariable(var_name);
+            if (!var->isFinal) {
+                if (var->type == Definition::INT && value->type == Definition::INT) {
+                    int final_value = std::stoi(var->value.content);
+                    final_value -= std::stoi(value->content);
+                    data.updateValueOfVariable(var->name, std::to_string(final_value));
+                } else if (var->type == Definition::DOUBLE && value->type == Definition::DOUBLE) {
+                    double final_value = std::stod(var->value.content);
+                    final_value -= std::stod(value->content);
+                    data.updateValueOfVariable(var->name, std::to_string(final_value));
+                } else if (var->type == Definition::STRING && value->type == Definition::STRING) {
+                    std::string final_value = var->value.content;
+                    size_t foundPos = final_value.find(value->content);
+                    if (foundPos != std::string::npos) {
+                        final_value.erase(foundPos, value->content.length());
+                    }
+                    data.updateValueOfVariable(var->name, final_value);
+                } else {
+                    std::cerr << "The value type and variable type is the same" << std::endl;
+                }
+            } else
+                std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
+        } else
             std::cerr << "Forgot to introduce value with '='" << std::endl;
-
-        auto value = ExpectValue(current, data);
-        if (!value.has_value())
-            std::cerr << "Forgot to give the new value to your variable" << std::endl;
-
-        if (!ExpectOperator(current, ";").has_value())
-            std::cerr << "forgot to close the instruction with ';'" << std::endl;
-
-        auto var = data.getVariable(var_name);
-        if (!var->isFinal)
-            data.updateValueOfVariable(var->name, value->content);
-        else
-            std::cerr << "The variable is declared as final so the action is impossible" << std::endl;
     }
 
     void JDDParser::specialVariable_defineFunction(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data, std::vector<Lexer::Token> tokenList, Definition::FunctionState state) {
