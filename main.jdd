@@ -1,0 +1,16 @@
+int a = 15;
+println(a);
+a += 10;
+println(a);
+double b = 15.0;
+println(b);
+b -= 10.0;
+println(b);
+string msg = "Hello, ";
+println(msg);
+msg += "World";
+println(msg);
+msg = "Hello, World 2 !!!";
+println(msg);
+msg -= "World";
+println(msg);
