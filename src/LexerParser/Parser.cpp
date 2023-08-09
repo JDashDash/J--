@@ -146,10 +146,10 @@ namespace JDD::Parser {
         if (!var_name.has_value())
             std::cerr << "Forgot to give a name to your variable" << std::endl;
 
-        if (!data.isFunction(var_name->content))
+        if (data.isFunction(var_name->content))
             std::cerr << "A function has already this name" << std::endl;
 
-        if (!data.isVariable(var_name->content))
+        if (data.isVariable(var_name->content))
             std::cerr << "A variable has already this name" << std::endl;
 
         if (var_name->content == "String")
@@ -217,10 +217,10 @@ namespace JDD::Parser {
             if (type == Definition::Types::FINAL_NotType)
                 std::cerr << "A function can not be declared as final" << std::endl;
 
-            if (!data.isFunction(name->content))
+            if (data.isFunction(name->content))
                 std::cerr << "A function has already this name" << std::endl;
 
-            if (!data.isVariable(name->content))
+            if (data.isVariable(name->content))
                 std::cerr << "A variable has already this name" << std::endl;
 
             Definition::Function function;
@@ -313,10 +313,10 @@ namespace JDD::Parser {
         }
 
         if (continueVariable) {
-            if (!data.isFunction(name->content))
+            if (data.isFunction(name->content))
                 std::cerr << "A function has already this name" << std::endl;
 
-            if (!data.isVariable(name->content))
+            if (data.isVariable(name->content))
                 std::cerr << "A variable has already this name" << std::endl;
 
             auto var_value = ExpectValue(current, data);
