@@ -1,5 +1,7 @@
-private void func() {
-    println("Hello World");
+private void func(int a) {
+    println(a);
 }
 
-func;
+func(a : 15);
+// error : println(a);
+println("Hello World");

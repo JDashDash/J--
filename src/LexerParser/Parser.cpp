@@ -481,12 +481,15 @@ namespace JDD::Parser {
                     std::cerr << "Forgot to give the value of the argument called '" + name->content << "'" << std::endl;
 
 
-                if (func->arguments.find(name->content) != func->arguments.end()) { // Found
-                    if (func->arguments[name->content].type == value->type) {
-                        func->arguments[name->content].value.content = value->content;
-                        func->arguments[name->content].value.type = func->arguments[name->content].type;
-                    } else
+                auto argIt = func->arguments.find(name->content);
+                if (argIt != func->arguments.end()) {
+                    if (argIt->second.type == value->type) {
+                        argIt->second.value.content = value->content;
+                        argIt->second.value.type = argIt->second.type;
+                    } else {
                         std::cerr << "The type of the value given and the type of the waiting argument are not the same" << std::endl;
+                        return;
+                    }
                 }
 
                 requireArgs -= 1;
@@ -513,13 +516,12 @@ namespace JDD::Parser {
 
         auto next_data = executeBlocCode(func->tokens, data, true);
 
-        for (const auto& possibleVar : data.Variables) {
-            if (argsFromFunc.find(possibleVar.second.name) != argsFromFunc.end()) // Found
-            {
-                data.Variables.erase(data.Variables.find(possibleVar.second.name),data.Variables.end()); // Deleting
+        for (const auto& a : func->arguments)
+        {
+            if (data.Variables.find(a.second.name) != data.Variables.end()) {
+                data.Variables.erase(a.second.name);
             }
         }
-        // Will remove these vars from universal data
 
         for (auto const& var : next_data.Variables) {
             if (data.isVariable(var.second.name)) {
