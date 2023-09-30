@@ -354,7 +354,7 @@ namespace JDD::Parser {
 
                 if (ExpectOperator(current, ")").has_value()) {
                     break;
-                } else if (ExpectOperator(current, ",").has_value())
+                } else if (!ExpectOperator(current, ",").has_value())
                     std::cerr << "Awaiting a new argument" << std::endl;
             }
 
@@ -461,18 +461,46 @@ namespace JDD::Parser {
 
     void JDDParser::functionManagement(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data, const std::string& func_name) {
         auto func = data.getFunction(func_name);
-        if (func->arguments.empty()) {
-            auto next_data = executeBlocCode(func->tokens, data, true);
+        if (!func->arguments.empty()) {
+            if (!ExpectOperator(current, "(").has_value())
+                std::cerr << "Forgot to open with '(' to specify the value required for arguments in the function you are calling" << std::endl;
 
-            for (auto const& var : next_data.Variables) {
-                if (data.isVariable(var.second.name)) {
-                    data.pushVariable(var.second);
+            size_t requireArgs = func->arguments.size();
+            while (requireArgs > 0) {
+                auto name = ExpectIdentifiant(current);
+                if (!name.has_value())
+                    std::cerr << "Forgot to give the name of the argument" << std::endl;
+
+                if (!ExpectOperator(current, ":").has_value())
+                    std::cerr << "Forgot to write ':' to specify the value of the argument next the name" << std::endl;
+
+                auto value = ExpectValue(current, data);
+                if (!value.has_value())
+                    std::cerr << "Forgot to give the value of the argument called '" + name->content << "'" << std::endl;
+
+                requireArgs -= 1;
+                if (requireArgs == 0) {
+                    break;
+                } else {
+                    if (!ExpectOperator(current, ",").has_value())
+                        std::cerr << "More arguments are required for the function called '" << func->name << "'" << std::endl;
                 }
             }
 
-            if (!ExpectOperator(current, ";").has_value())
-                std::cerr << "Forgot to close the instruction with ';'" << std::endl;
+            if (!ExpectOperator(current, ")").has_value())
+                std::cerr << "Forgot to close with ')' when you are calling your function called '" << func->name << "'" << std::endl;
         }
+
+        auto next_data = executeBlocCode(func->tokens, data, true);
+
+        for (auto const& var : next_data.Variables) {
+            if (data.isVariable(var.second.name)) {
+                data.pushVariable(var.second);
+            }
+        }
+
+        if (!ExpectOperator(current, ";").has_value())
+            std::cerr << "Forgot to close the instruction with ';'" << std::endl;
     }
 
     void JDDParser::import(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data) {
