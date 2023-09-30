@@ -1,10 +1,5 @@
-int a = 10;
-int b = a:reference;
-
-private void func() {
-    a = 15;
+private void func(int a, int b) {
+    println("Hello World");
 }
 
-func;
-
-println(a ", " b);
+func(a: 10, b: 25);
