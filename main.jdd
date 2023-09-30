@@ -1,5 +1,5 @@
-private void func(int a, int b) {
+private void func() {
     println("Hello World");
 }
 
-func(a: 10, b: 25);
+func;

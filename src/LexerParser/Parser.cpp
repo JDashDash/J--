@@ -461,7 +461,9 @@ namespace JDD::Parser {
 
     void JDDParser::functionManagement(std::vector<Lexer::Token>::const_iterator &current, Definition::Data &data, const std::string& func_name) {
         auto func = data.getFunction(func_name);
-        if (!func->arguments.empty()) {
+        if (func->arguments.empty() && ExpectOperator(current, "(").has_value() && ExpectOperator(current, ")").has_value()) {
+            // Accepting...
+        } else if (!func->arguments.empty()) {
             if (!ExpectOperator(current, "(").has_value())
                 std::cerr << "Forgot to open with '(' to specify the value required for arguments in the function you are calling" << std::endl;
 
@@ -478,20 +480,46 @@ namespace JDD::Parser {
                 if (!value.has_value())
                     std::cerr << "Forgot to give the value of the argument called '" + name->content << "'" << std::endl;
 
+
+                if (func->arguments.find(name->content) != func->arguments.end()) { // Found
+                    if (func->arguments[name->content].type == value->type) {
+                        func->arguments[name->content].value.content = value->content;
+                        func->arguments[name->content].value.type = func->arguments[name->content].type;
+                    } else
+                        std::cerr << "The type of the value given and the type of the waiting argument are not the same" << std::endl;
+                }
+
                 requireArgs -= 1;
                 if (requireArgs == 0) {
                     break;
                 } else {
-                    if (!ExpectOperator(current, ",").has_value())
+                    if (!ExpectOperator(current, ",").has_value()) {
                         std::cerr << "More arguments are required for the function called '" << func->name << "'" << std::endl;
+                    }
                 }
             }
 
-            if (!ExpectOperator(current, ")").has_value())
+            if (!ExpectOperator(current, ")").has_value()) {
                 std::cerr << "Forgot to close with ')' when you are calling your function called '" << func->name << "'" << std::endl;
+            }
         }
 
+        std::map<std::string, JDD::Definition::Argument> argsFromFunc; // args added to data to don't check for variable + arguments in Expecters
+        for (const auto& a : func->arguments)
+        {
+            argsFromFunc[a.second.name] = a.second;
+            data.Variables[a.second.name] = JDD::Definition::Variable(a.second.name, a.second.value, a.second.type);
+        } // Adding these arguments to universal data to have it in the function
+
         auto next_data = executeBlocCode(func->tokens, data, true);
+
+        for (const auto& possibleVar : data.Variables) {
+            if (argsFromFunc.find(possibleVar.second.name) != argsFromFunc.end()) // Found
+            {
+                data.Variables.erase(data.Variables.find(possibleVar.second.name),data.Variables.end()); // Deleting
+            }
+        }
+        // Will remove these vars from universal data
 
         for (auto const& var : next_data.Variables) {
             if (data.isVariable(var.second.name)) {
