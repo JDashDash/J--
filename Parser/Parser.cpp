@@ -35,7 +35,7 @@ namespace JDD::Parser {
         auto current = tokensList.begin();
 
         while (current != tokensList.end()) {
-            if (!instructionsManagement(data, tokensList, current)) {
+            if (!instructionsManagement(data, tokensList, current, (std::optional<Function> &) std::nullopt)) {
                 std::cerr  << "{UNKNOWN} -> " << *current << std::endl;
                 ++current;
             }
@@ -45,16 +45,14 @@ namespace JDD::Parser {
     void runCodeBlock(std::vector<JDD::Lexer::Token>& tokenBlock, Data& globalData, Function& function) {
         auto current = tokenBlock.begin();
         while (current != tokenBlock.end()) {
-            if (!instructionsManagement(globalData, tokenBlock, current)) {
+            if (!instructionsManagement(globalData, tokenBlock, current,reinterpret_cast<std::optional<Function> &>(function))) {
                 std::cerr  << "{UNKNOWN} -> " << *current << std::endl;
                 ++current;
             }
         }
     }
 
-    void print(Data &data, std::vector<JDD::Lexer::Token> &vector, std::vector<Token>::iterator &iterator);
-
-    bool instructionsManagement(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current) {
+    bool instructionsManagement(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, std::optional<Function>& function) {
         auto instruction = ExpectIdentifiant(current);
 
         if (instruction.has_value() && instruction->content == "int") {
