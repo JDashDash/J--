@@ -42,7 +42,7 @@ namespace JDD::Parser {
         }
     }
 
-    void runCodeBlock(std::vector<JDD::Lexer::Token>& tokenBlock, Data& globalData) {
+    void runCodeBlock(std::vector<JDD::Lexer::Token>& tokenBlock, Data& globalData, Function& function) {
         auto current = tokenBlock.begin();
         while (current != tokenBlock.end()) {
             if (!instructionsManagement(globalData, tokenBlock, current)) {
@@ -106,8 +106,6 @@ namespace JDD::Parser {
             exit(22);
         }
 
-
-
         std::vector<Token> contentPrint;
 
         while (!ExpectOperator(current, ")").has_value()) {
@@ -136,7 +134,7 @@ namespace JDD::Parser {
         }
 
         if (jumpLine) {
-            std::cout << "\n" << finalResultPrint;
+            std::cout << finalResultPrint << std::endl;
         } else {
             std::cout << finalResultPrint;
         }
@@ -267,7 +265,7 @@ namespace JDD::Parser {
             }
         } else if (data.isFunction(id.content)) {
             auto func = data.getFunctionFromName(id.content);
-            runCodeBlock(func->content_tokens, data);
+            runCodeBlock(func->content_tokens, data, func.value());
         }
 
         if (!ExpectOperator(current, ";")) {
