@@ -3,9 +3,8 @@
 #include <algorithm>
 #include <cctype>
 #include <utility>
-
-#include "src/LexerParser/Lexer.h"
-#include "src/LexerParser/Parser.h"
+#include "Lexer/Lexer.h"
+#include "Parser/Parser.h"
 
 bool endsWith(std::string_view str, std::string_view suffix) {
     if (str.length() >= suffix.length()) {
@@ -35,7 +34,7 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    std::ifstream file {file_name};
+    std::ifstream file{file_name};
     if (!file) {
         std::cerr << "Error: Unable to open the specified file." << std::endl;
         return -1;
@@ -43,11 +42,8 @@ int main(int argc, char** argv) {
 
     std::string code((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
 
-    auto tokenList = JDD::Lexer::Builder::ParserTokens(code);
-
-    //for (auto const& e : tokenList) std::cout << e << std::endl;
-
-    JDD::Parser::JDDParser::main(tokenList);
-
+    auto lexerResult = JDD::Lexer::Lexer(code);
+    //for (auto const& t : lexerResult) {std::cout << t << std::endl;}
+    JDD::Parser::run(lexerResult);
     return 0;
 }

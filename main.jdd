@@ -1,7 +1,6 @@
-private void func(int a) {
-    println(a);
+private void myFunc() {
+    println("abc, test : ", 3, " ", 10, " ", 50+3);
+    println("It's my result : ", 5 + 3);
 }
 
-func(a : 15);
-// error : println(a);
-println("Hello World");
+myFunc;
