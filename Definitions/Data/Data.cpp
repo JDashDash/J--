@@ -56,4 +56,10 @@ namespace JDD::Definitions {
         }
         return std::nullopt;
     }
+
+    void Data::removeFunctionFromName(const std::string &name) {
+        if (this->isFunction(name)) {
+            this->Functions.erase(name);
+        }
+    }
 }

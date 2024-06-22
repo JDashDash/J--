@@ -22,5 +22,6 @@ namespace JDD::Definitions {
         [[nodiscard]] bool isFunction(const std::string& name) const;
         void addFunctionToData(const Function& func);
         std::optional<Function> getFunctionFromName(const std::string& name);
+        void removeFunctionFromName(const std::string& name);
     };
 }
