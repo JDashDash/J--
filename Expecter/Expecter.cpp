@@ -108,53 +108,9 @@ namespace JDD::Parser {
         return {leftElement, rightElement};
     }
 
-    JDD::Definitions::Types returnFinalTypeFromLexerType(JDD::Lexer::Types t) {
-        if (t == JDD::Lexer::Types::INT) {
-            return Definitions::INT;
-        } else if (t == JDD::Lexer::Types::DOUBLE) {
-            return Definitions::DOUBLE;
-        } else if (t == JDD::Lexer::Types::STRING) {
-            return Definitions::STRING;
-        } else if (t == JDD::Lexer::Types::BOOL) {
-            return Definitions::BOOLEAN;
-        }
-        return Definitions::VOID;
-    }
-
-    JDD::Definitions::Value ReturnFinalValueFromListToken(JDD::Definitions::Data& data, std::vector<JDD::Lexer::Token>::iterator& current, std::vector<JDD::Lexer::Token>& list, JDD::Definitions::Types& awaitingType) {
+    JDD::Definitions::Value ReturnFinalValueFromListToken(JDD::Definitions::Data& data, std::vector<JDD::Lexer::Token>::iterator& current, std::vector<JDD::Lexer::Token>& list, JDD::Definitions::Types& awaitingType, std::optional<JDD::Definitions::Function>& function) {
         JDD::Definitions::Value value;
-        if (list.size() == 1) { // Basic value : strings, boolean, number, value from variable or from function
-            if (list[0].type == Lexer::STRING) {
-                value.type = Definitions::STRING;
-                value.content = list[0].content;
-            }
-            else if (list[0].type == Lexer::BOOL) {
-                value.type = Definitions::BOOLEAN;
-                if (list[0].content == "true") {
-                    value.content = "1";
-                } else {
-                    value.content = "0";
-                }
-            }
-            else if (list[0].type == Lexer::DOUBLE) {
-                value.type = Definitions::DOUBLE;
-                value.content = list[0].content;
-            } else if (list[0].type == Lexer::INT) {
-                value.type = Definitions::INT;
-                value.content = list[0].content;
-            }
-            else if (list[0].type == Lexer::IDENTIFIANT && data.isVariable(list[0].content) && data.getVariableFromName(list[0].content)->type == awaitingType) { // case of a variable
-                value.type = awaitingType;
-                value.content = data.getVariableFromName(list[0].content)->value.content;
-            } else if (returnFinalTypeFromLexerType(list[0].type) == awaitingType) {
-                value.type = awaitingType;
-                value.content = list[0].content;
-            } else {
-                std::cerr << "[TYPE] The type is not valid for the one asked, line " << current->line << std::endl;
-                exit(22);
-            }
-        }
-        else if (list.size() > 1 && (awaitingType == Definitions::INT || awaitingType == Definitions::VOID)) {
+        if (list.size() > 1 && (awaitingType == Definitions::INT || awaitingType == Definitions::VOID)) {
             auto possibleMul = haveChar(list, "*");
             while (possibleMul.first) {
                 auto elements = getElementsFromIndexChar(list, possibleMul.second);
