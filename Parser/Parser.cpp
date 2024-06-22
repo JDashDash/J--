@@ -28,6 +28,19 @@ namespace JDD::Parser {
         return result;
     }
 
+    JDD::Definitions::Types returnFinalTypeFromLexerType(JDD::Lexer::Types t) {
+        if (t == JDD::Lexer::Types::INT) {
+            return Definitions::INT;
+        } else if (t == JDD::Lexer::Types::DOUBLE) {
+            return Definitions::DOUBLE;
+        } else if (t == JDD::Lexer::Types::STRING) {
+            return Definitions::STRING;
+        } else if (t == JDD::Lexer::Types::BOOL) {
+            return Definitions::BOOLEAN;
+        }
+        return Definitions::VOID;
+    }
+
 
 
     void run(std::vector<JDD::Lexer::Token>& tokensList)  {
@@ -42,10 +55,10 @@ namespace JDD::Parser {
         }
     }
 
-    void runCodeBlock(std::vector<JDD::Lexer::Token>& tokenBlock, Data& globalData, Function& function) {
+    void runCodeBlock(std::vector<JDD::Lexer::Token>& tokenBlock, Data& globalData, std::optional<Function>& function) {
         auto current = tokenBlock.begin();
         while (current != tokenBlock.end()) {
-            if (!instructionsManagement(globalData, tokenBlock, current,reinterpret_cast<std::optional<Function> &>(function))) {
+            if (!instructionsManagement(globalData, tokenBlock, current, function)) {
                 std::cerr  << "{UNKNOWN} -> " << *current << std::endl;
                 ++current;
             }
@@ -54,21 +67,20 @@ namespace JDD::Parser {
 
     bool instructionsManagement(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, std::optional<Function>& function) {
         auto instruction = ExpectIdentifiant(current);
-
         if (instruction.has_value() && instruction->content == "int") {
-            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::INT);
+            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::INT, function);
             return true;
         } else if (instruction.has_value() && instruction->content == "double") {
-            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::DOUBLE);
+            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::DOUBLE, function);
             return true;
         } else if (instruction.has_value() && instruction->content == "string") {
-            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::STRING);
+            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::STRING, function);
             return true;
         } else if (instruction.has_value() && instruction->content == "boolean") {
-            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::BOOLEAN);
+            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::BOOLEAN, function);
             return true;
         } else if (instruction.has_value() && instruction->content == "final") {
-            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::FINAL_NotType);
+            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::FINAL_NotType, function);
             return true;
         } else if (instruction.has_value() && instruction->content == "delete") {
             deleteVariableOrFunction(data, tokensList, current);
@@ -86,10 +98,13 @@ namespace JDD::Parser {
             functionDeclaration(data, tokensList, current, JDD::Definitions::FunctionState::FuncProtected);
             return true;
         } else if (instruction.has_value() && instruction->content == "print") {
-            print(data, tokensList, current, false);
+            print(data, tokensList, current, false, function);
             return true;
         } else if (instruction.has_value() && instruction->content == "println") {
-            print(data, tokensList, current, true);
+            print(data, tokensList, current, true, function);
+            return true;
+        } else if (instruction.has_value() && instruction->content == "return") {
+            returnFromFunction(data, tokensList, current, function);
             return true;
         } else if (instruction.has_value()) {
             managementVariablesFunctionsCallModification(data, tokensList, current, instruction.value());
@@ -98,7 +113,7 @@ namespace JDD::Parser {
         return false;
     }
 
-    void print(Data &data, std::vector<JDD::Lexer::Token> &tokensList, std::vector<Token>::iterator &current, bool jumpLine) {
+    void print(Data &data, std::vector<JDD::Lexer::Token> &tokensList, std::vector<Token>::iterator &current, bool jumpLine, std::optional<Function>& function) {
         if (!ExpectOperator(current, "(").has_value()) {
             std::cerr << "[PRINT] To give input open '()', line " << current->line << std::endl;
             exit(22);
@@ -117,12 +132,88 @@ namespace JDD::Parser {
             auto valuesInPrint = splitByComma(contentPrint);
             for (auto e : valuesInPrint) {
                 JDD::Definitions::Types awaitingType = JDD::Definitions::VOID;
-                auto v = ReturnFinalValueFromListToken(data, current, e, awaitingType);
+                auto v = Value();
+                if (contentPrint.size() == 1) {
+                    if (contentPrint[0].type == Lexer::STRING) {
+                        v.type = Definitions::STRING;
+                        v.content = contentPrint[0].content;
+                    }
+                    else if (contentPrint[0].type == Lexer::BOOL) {
+                        v.type = Definitions::BOOLEAN;
+                        if (contentPrint[0].content == "true") {
+                            v.content = "1";
+                        } else {
+                            v.content = "0";
+                        }
+                    }
+                    else if (contentPrint[0].type == Lexer::DOUBLE) {
+                        v.type = Definitions::DOUBLE;
+                        v.content = contentPrint[0].content;
+                    }
+                    else if (contentPrint[0].type == Lexer::INT) {
+                        v.type = Definitions::INT;
+                        v.content = contentPrint[0].content;
+                    }
+                    else if (contentPrint[0].type == Lexer::IDENTIFIANT && data.isVariable(contentPrint[0].content)) { // case of a variable
+                        v.type = data.getVariableFromName(contentPrint[0].content)->type;
+                        v.content = data.getVariableFromName(contentPrint[0].content)->value.content;
+                    }
+                    else if (contentPrint[0].type == Lexer::IDENTIFIANT && data.isFunction(contentPrint[0].content)) { // case of a function
+                        auto func = data.getFunctionFromName(contentPrint[0].content);
+                        runCodeBlock(func->content_tokens, data, func);
+                        v.type = func->returnVariable.type;
+                        v.content = func->returnVariable.value.content;
+                    }
+                    else {
+                        std::cerr << "[TYPE] The type is not valid for the one asked, line " << current->line << std::endl;
+                        exit(22);
+                    }
+                } else {
+                    v = ReturnFinalValueFromListToken(data, current, contentPrint, awaitingType, function);
+                }
                 finalResultPrint += v.content;
             }
         } else {
             JDD::Definitions::Types awaitingType = JDD::Definitions::VOID;
-            auto v = ReturnFinalValueFromListToken(data, current, contentPrint, awaitingType);
+            auto v = Value();
+            if (contentPrint.size() == 1) {
+                if (contentPrint[0].type == Lexer::STRING) {
+                    v.type = Definitions::STRING;
+                    v.content = contentPrint[0].content;
+                }
+                else if (contentPrint[0].type == Lexer::BOOL) {
+                    v.type = Definitions::BOOLEAN;
+                    if (contentPrint[0].content == "true") {
+                        v.content = "1";
+                    } else {
+                        v.content = "0";
+                    }
+                }
+                else if (contentPrint[0].type == Lexer::DOUBLE) {
+                    v.type = Definitions::DOUBLE;
+                    v.content = contentPrint[0].content;
+                }
+                else if (contentPrint[0].type == Lexer::INT) {
+                    v.type = Definitions::INT;
+                    v.content = contentPrint[0].content;
+                }
+                else if (contentPrint[0].type == Lexer::IDENTIFIANT && data.isVariable(contentPrint[0].content)) { // case of a variable
+                    v.type = data.getVariableFromName(contentPrint[0].content)->type;
+                    v.content = data.getVariableFromName(contentPrint[0].content)->value.content;
+                }
+                else if (contentPrint[0].type == Lexer::IDENTIFIANT && data.isFunction(contentPrint[0].content)) { // case of a function
+                    auto func = data.getFunctionFromName(contentPrint[0].content);
+                    runCodeBlock(func->content_tokens, data, func);
+                    v.type = func->returnVariable.type;
+                    v.content = func->returnVariable.value.content;
+                }
+                else {
+                    std::cerr << "[TYPE] The type is not valid for the one asked, line " << current->line << std::endl;
+                    exit(22);
+                }
+            } else {
+                v = ReturnFinalValueFromListToken(data, current, contentPrint, awaitingType, function);
+            }
             finalResultPrint += v.content;
         }
 
@@ -138,7 +229,7 @@ namespace JDD::Parser {
         }
     }
 
-    void basicVariableDeclaration(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, JDD::Definitions::Types type) {
+    void basicVariableDeclaration(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, JDD::Definitions::Types type, std::optional<Function>& function) {
         std::optional<Definitions::Types> var_type = type;
         bool isFinal = false;
         if (type == Definitions::FINAL_NotType) {
@@ -182,7 +273,46 @@ namespace JDD::Parser {
         var.name = name->content;
         var.type = type;
         var.isFinal = isFinal;
-        var.value = ReturnFinalValueFromListToken(data, current, contentValueVariable, var.type);
+
+        if (contentValueVariable.size() == 1) {
+            if (contentValueVariable[0].type == Lexer::STRING) {
+                var.value.type = Definitions::STRING;
+                var.value.content = contentValueVariable[0].content;
+            }
+            else if (contentValueVariable[0].type == Lexer::BOOL) {
+                var.value.type = Definitions::BOOLEAN;
+                if (contentValueVariable[0].content == "true") {
+                    var.value.content = "1";
+                } else {
+                    var.value.content = "0";
+                }
+            }
+            else if (contentValueVariable[0].type == Lexer::DOUBLE) {
+                var.value.type = Definitions::DOUBLE;
+                var.value.content = contentValueVariable[0].content;
+            }
+            else if (contentValueVariable[0].type == Lexer::INT) {
+                var.value.type = Definitions::INT;
+                var.value.content = contentValueVariable[0].content;
+            }
+            else if (contentValueVariable[0].type == Lexer::IDENTIFIANT && data.isVariable(contentValueVariable[0].content)) { // case of a variable
+                var.value.type = var.type;
+                var.value.content = data.getVariableFromName(contentValueVariable[0].content)->value.content;
+            }
+            else if (contentValueVariable[0].type == Lexer::IDENTIFIANT && data.isFunction(contentValueVariable[0].content)) { // case of a function
+                auto func = data.getFunctionFromName(contentValueVariable[0].content);
+                runCodeBlock(func->content_tokens, data, func);
+                var.value.type = func->returnVariable.type;
+                var.value.content = func->returnVariable.value.content;
+            }
+            else {
+                std::cerr << "[TYPE] The type is not valid for the one asked, line " << current->line << std::endl;
+                exit(22);
+            }
+        } else {
+            var.value = ReturnFinalValueFromListToken(data, current, contentValueVariable, var.type, function);
+        }
+
         data.addVariableToData(var);
     }
 
@@ -263,11 +393,24 @@ namespace JDD::Parser {
             }
         } else if (data.isFunction(id.content)) {
             auto func = data.getFunctionFromName(id.content);
-            runCodeBlock(func->content_tokens, data, func.value());
+            if (func->sizeArgumentsNeeded() == 0) {
+                runCodeBlock(func->content_tokens, data, func);
+                if (ExpectOperator(current, "(").has_value()) {
+                    if (!ExpectOperator(current, ")").has_value()) {
+                        std::cerr << "[FUNCTION CALL] The function has no argument, you can delete these chars or just close instant like this : '" << func->name << "();"  << "', or '" << func->name << ";', line " << current->line << std::endl;
+                        exit(23);
+                    }
+                }
+            } else {
+                if (!ExpectOperator(current, "(")) {
+                    std::cerr << "[FUNCTION CALL] To give value of arguments open with '(argValue1, argValue2, ...)', line " << current->line << std::endl;
+                    exit(17);
+                }
+            }
         }
 
         if (!ExpectOperator(current, ";")) {
-            std::cerr << "[OPERATIONS: Variables] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
+            std::cerr << "[OPERATIONS] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
             exit(6);
         }
     }
@@ -279,18 +422,21 @@ namespace JDD::Parser {
             exit(3);
         }
 
-        if (!data.getVariableFromName(id->content).has_value()) {
-            std::cerr << "[DELETE: Variables - Functions] The variable/function does not exist, line " << current->line << std::endl;
-            exit(7);
-        }
-
-        auto var = data.getVariableFromName(id->content);
-        if (var.has_value()) {
+        if (data.isVariable(id->content)) {
             data.removeVariableFromName(id->content);
             if (!ExpectOperator(current, ";")) {
                 std::cerr << "[DELETE: Variables] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
                 exit(6);
             }
+        } else if (data.isFunction(id->content)) {
+            data.removeFunctionFromName(id->content);
+            if (!ExpectOperator(current, ";")) {
+                std::cerr << "[DELETE: Variable] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
+                exit(6);
+            }
+        } else {
+            std::cerr << "[DELETE] Variable name or function name is invalid, line " << current->line << std::endl;
+            exit(24);
         }
     }
 
@@ -441,5 +587,47 @@ namespace JDD::Parser {
         }
 
         data.addFunctionToData(function);
+    }
+
+    void returnFromFunction(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, std::optional<Function>& function) {
+        if (function.has_value()) {
+            std::vector<Token> contentValueVariable;
+
+            while (!ExpectOperator(current, ";").has_value()) {
+                contentValueVariable.push_back(*current);
+                ++current;
+            }
+
+            if (contentValueVariable.size() == 1) {
+                if (contentValueVariable[0].type == Lexer::STRING) {
+                    function->returnVariable.value.content = contentValueVariable[0].content;
+                } else if (contentValueVariable[0].type == Lexer::BOOL) {
+                    if (contentValueVariable[0].content == "true") {
+                        function->returnVariable.value.content = "1";
+                    } else {
+                        function->returnVariable.value.content = "0";
+                    }
+                } else if (contentValueVariable[0].type == Lexer::DOUBLE) {
+                    function->returnVariable.value.content = contentValueVariable[0].content;
+                } else if (contentValueVariable[0].type == Lexer::INT) {
+                    function->returnVariable.value.content = contentValueVariable[0].content;
+                } else if (contentValueVariable[0].type == Lexer::IDENTIFIANT && data.isVariable(contentValueVariable[0].content)) { // case of a variable
+                    function->returnVariable.value.content = data.getVariableFromName(contentValueVariable[0].content)->value.content;
+                } else if (contentValueVariable[0].type == Lexer::IDENTIFIANT && data.isFunction(contentValueVariable[0].content)) { // case of a function
+                    auto func = data.getFunctionFromName(contentValueVariable[0].content);
+                    runCodeBlock(func->content_tokens, data, func);
+                    function->returnVariable.value.type = func->returnVariable.type;
+                    function->returnVariable.value.content = func->returnVariable.value.content;
+                } else {
+                    std::cerr << "[TYPE] The type is not valid for the one asked, line " << current->line << std::endl;
+                    exit(22);
+                }
+            } else {
+                function->returnVariable.value = ReturnFinalValueFromListToken(data, current, contentValueVariable, function->returnVariable.type, function);
+            }
+        } else {
+            std::cerr << "[RETURN] The return instruction has to be called in the code of your function, line " << current->line << std::endl;
+            exit(25);
+        }
     }
 }
