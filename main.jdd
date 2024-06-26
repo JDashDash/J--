@@ -1,5 +1,7 @@
 private int myFunc() {
+    println("b :");
     return 5;
+    println("a");
 }
 
 int b = myFunc;

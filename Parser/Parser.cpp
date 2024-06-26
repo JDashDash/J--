@@ -58,6 +58,10 @@ namespace JDD::Parser {
     void runCodeBlock(std::vector<JDD::Lexer::Token>& tokenBlock, Data& globalData, std::optional<Function>& function) {
         auto current = tokenBlock.begin();
         while (current != tokenBlock.end()) {
+            if (function.has_value() && function->isStopped) {
+                break;
+            }
+
             if (!instructionsManagement(globalData, tokenBlock, current, function)) {
                 std::cerr  << "{UNKNOWN} -> " << *current << std::endl;
                 ++current;
@@ -625,6 +629,8 @@ namespace JDD::Parser {
             } else {
                 function->returnVariable.value = ReturnFinalValueFromListToken(data, current, contentValueVariable, function->returnVariable.type, function);
             }
+
+            function->isStopped = true;
         } else {
             std::cerr << "[RETURN] The return instruction has to be called in the code of your function, line " << current->line << std::endl;
             exit(25);

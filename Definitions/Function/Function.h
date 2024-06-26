@@ -31,6 +31,7 @@ namespace JDD::Definitions {
         std::map<std::string, Argument> arguments;
         std::vector<Lexer::Token> content_tokens;
         std::vector<std::string> filesAllowAccess;
+        bool isStopped = false; // when there is a "return", it is
 
         bool isCallable(const std::string& elem);
         [[nodiscard]] bool isArgument(const std::string& n) const;
